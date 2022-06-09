@@ -1,7 +1,6 @@
 import { TableSortLabel, TextField, Tooltip } from '@material-ui/core'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp'
-import cx from 'classnames'
 import React, { CSSProperties, MouseEventHandler, PropsWithChildren, ReactElement, useEffect } from 'react'
 import {
   Cell,
@@ -31,7 +30,6 @@ import { camelToWords, useDebounce, useLocalStorage } from '../utils'
 import { FilterChipBar } from './FilterChipBar'
 import { fuzzyTextFilter, numericTextFilter } from './filters'
 import { ResizeHandle } from './ResizeHandle'
-import { TableDebug } from './TableDebug'
 import { TablePagination } from './TablePagination'
 import {
   HeaderCheckbox,
@@ -44,10 +42,44 @@ import {
   TableLabel,
   TableRow,
   TableTable,
-  useStyles,
 } from './TableStyles'
 import { TableToolbar } from './TableToolbar'
 import { TooltipCellRenderer } from './TooltipCell'
+
+import { cx, css } from '@emotion/css'
+const tableSortLabel = css`
+    & svg {
+      width: 16px;
+      height: 16px;
+      margin-top: 0px;
+      margin-left: 2px;
+    }
+`;
+
+const headerIcon = css`
+  & svg {
+    width: 16px;
+    height: 16px;
+    margin-top: 4px;
+    margin-right: 0px;
+  }
+`;
+
+const iconDirectionAsc = css`
+  transform: rotate(90deg);
+`;
+const iconDirectionDesc = css`
+  transform: rotate(180deg);
+`;
+const cellIcon = css`
+  & svg {
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+  }
+`;
+
+
 
 export interface TableProperties<T extends Record<string, unknown>> extends TableOptions<T> {
   name: string
@@ -168,8 +200,7 @@ const filterTypes = {
 }
 
 export function Table<T extends Record<string, unknown>>(props: PropsWithChildren<TableProperties<T>>): ReactElement {
-  const { name, columns, onAdd, onDelete, onEdit, onClick } = props
-  const classes = useStyles()
+  const { name, columns, onAdd, onDelete, onEdit, onClick } = props;
 
   const [initialState, setInitialState] = useLocalStorage(`tableState:${name}`, {})
   const instance = useTable<T>(
@@ -235,7 +266,7 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
                             direction={column.isGrouped ? 'desc' : 'asc'}
                             IconComponent={KeyboardArrowRight}
                             {...columnGroupByProps}
-                            className={classes.headerIcon}
+                            className={headerIcon}
                           />
                         </Tooltip>
                       )}
@@ -245,7 +276,7 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
                             active={column.isSorted}
                             direction={column.isSortedDesc ? 'desc' : 'asc'}
                             {...columnSortByProps}
-                            className={classes.tableSortLabel}
+                            className={tableSortLabel}
                             style={style}
                           >
                             {column.render('Header')}
@@ -271,7 +302,9 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
               <TableRow
                 key={rowKey}
                 {...getRowProps}
-                className={cx({ rowSelected: row.isSelected, clickable: onClick })}
+                className={cx(
+                  {'rowSelected': row.isSelected}
+                )}
               >
                 {row.cells.map((cell) => {
                   const { key: cellKey, role: cellRole, ...getCellProps } = cell.getCellProps(cellProps)
@@ -281,14 +314,14 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
                         <>
                           <TableSortLabel
                             classes={{
-                              iconDirectionAsc: classes.iconDirectionAsc,
-                              iconDirectionDesc: classes.iconDirectionDesc,
+                              iconDirectionAsc: iconDirectionAsc,
+                              iconDirectionDesc: iconDirectionDesc,
                             }}
                             active
                             direction={row.isExpanded ? 'desc' : 'asc'}
                             IconComponent={KeyboardArrowUp}
                             {...row.getToggleRowExpandedProps()}
-                            className={classes.cellIcon}
+                            className={cellIcon}
                           />{' '}
                           {cell.render('Cell', { editable: false })} ({row.subRows.length})
                         </>
@@ -306,7 +339,6 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
         </TableBody>
       </TableTable>
       <TablePagination<T> instance={instance} />
-      <TableDebug enabled instance={instance} />
     </>
   )
 }

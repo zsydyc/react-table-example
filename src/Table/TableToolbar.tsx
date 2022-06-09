@@ -224,7 +224,7 @@ export function TableToolbar<T extends Record<string, unknown>>({
         <SmallIconActionButton
           icon={<FilterListIcon />}
           onClick={handleFilterClick}
-          label='Filter by columns'
+          label='Filter by columnsFilter by columnsFilter by columnsFilter by columnsFilter by columns'
           variant='right'
         />
       </div>
