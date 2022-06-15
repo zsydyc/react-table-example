@@ -30,6 +30,7 @@ Other features:
     - TooltipCell.tsx
     - TablePagination.tsx (Removed MUI pagination, re-write)
     - ResizeHandle.tsx
+    - Debug page (removed)
     - Table.tsx (50%)
     - TableStyles.tsx (50% done, need to clean `styled`)
 
@@ -43,7 +44,6 @@ Other features:
     - TableSortLabel
     - TextField
     - MUI icons
-
  - The current example is using MUI 4, if we have to use MUI components (e.g. Popover), we need to upgrade to MUI 5.
 
 

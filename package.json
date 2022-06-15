@@ -54,7 +54,9 @@
     "start": "PORT=4000 react-scripts start",
     "test": "react-scripts test"
   },
-  
+  "eslintConfig": {
+    "extends": "react-app"
+  },
   "browserslist": {
     "production": [
       ">0.2%",

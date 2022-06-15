@@ -128,7 +128,7 @@ export const TableHeadCell: React.FC<Partial<TableCellProps> & CN> = ({ children
 
 export const TableRow: React.FC<Partial<TableRowTypeMap> & CN> = ({ children, className, ...rest }) => {
   return (
-    <MuiTableRow className={cx(className, tableRow)} {...rest}>
+    <MuiTableRow className={cx(className, tableRow)} {...rest}> 
       {children}
     </MuiTableRow>
   )

@@ -1,7 +1,7 @@
+import React, { CSSProperties, MouseEventHandler, PropsWithChildren, ReactElement, useEffect, useRef } from 'react'
 import { TableSortLabel, TextField, Tooltip } from '@material-ui/core'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp'
-import React, { CSSProperties, MouseEventHandler, PropsWithChildren, ReactElement, useEffect } from 'react'
 import {
   Cell,
   CellProps,
@@ -25,6 +25,7 @@ import {
   useSortBy,
   useTable,
 } from 'react-table'
+import ContextMenu from "./ContextMenu";
 
 import { camelToWords, useDebounce, useLocalStorage } from '../utils'
 import { FilterChipBar } from './FilterChipBar'
@@ -40,7 +41,7 @@ import {
   TableHeadCell,
   TableHeadRow,
   TableLabel,
-  TableRow,
+  // TableRow,
   TableTable,
 } from './TableStyles'
 import { TableToolbar } from './TableToolbar'
@@ -201,6 +202,9 @@ const filterTypes = {
 
 export function Table<T extends Record<string, unknown>>(props: PropsWithChildren<TableProperties<T>>): ReactElement {
   const { name, columns, onAdd, onDelete, onEdit, onClick } = props;
+  // todo: add context menu
+  // const tableRowRef = useRef(null);
+
 
   const [initialState, setInitialState] = useLocalStorage(`tableState:${name}`, {})
   const instance = useTable<T>(
@@ -299,13 +303,16 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
             prepareRow(row)
             const { key: rowKey, role: rowRole, ...getRowProps } = row.getRowProps()
             return (
-              <TableRow
+              <tr
+              // todo: add context menu
+                // ref={tableRowRef} 
                 key={rowKey}
                 {...getRowProps}
                 className={cx(
                   {'rowSelected': row.isSelected}
                 )}
               >
+                {/* <ContextMenu outerRef={tableRowRef} /> */}
                 {row.cells.map((cell) => {
                   const { key: cellKey, role: cellRole, ...getCellProps } = cell.getCellProps(cellProps)
                   return (
@@ -333,7 +340,7 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
                     </TableCell>
                   )
                 })}
-              </TableRow>
+              </tr>
             )
           })}
         </TableBody>
