@@ -54,6 +54,15 @@ export function FilterChipBar<T extends Record<string, unknown>>({
     [setFilter]
   )
 
+  const handleEnumDelete = useCallback(
+    (id: string | number, enumType: string) => {
+      const newFilters = filters.find(f => f.id === id)?.value
+      delete newFilters[enumType]
+      setFilter(id as IdType<T>, newFilters)
+    },
+    [setFilter]
+  )
+
   return Object.keys(filters).length > 0 ? (
     <div className={classes.chipZone}>
       <span className={classes.filtersActiveLabel}>Active filters:</span>
@@ -61,6 +70,29 @@ export function FilterChipBar<T extends Record<string, unknown>>({
         allColumns.map((column) => {
           const filter = filters.find((f) => f.id === column.id)
           const value = filter && filter.value
+
+          // This is using an enum type
+          if (typeof value === 'object') {
+            return (
+              <>
+                {Object.keys(value).map((value: string) => (
+                  <Chip
+                    className={classes.filterChip}
+                    key={`${column.id}_${value}`}
+                    label={
+                      <>
+                        <span className={classes.chipLabel}>{column.render('Header')}: </span>
+                        {getFilterValue(column, value)}
+                      </>
+                    }
+                    onDelete={() => handleEnumDelete(column.id, value)}
+                    variant='outlined'
+                  />
+                ))}
+              </>
+            )
+          }
+
           return (
             value && (
               <Chip

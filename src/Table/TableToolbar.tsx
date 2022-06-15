@@ -1,16 +1,23 @@
+import React, { MouseEvent, MouseEventHandler, PropsWithChildren, ReactElement, useCallback, useState } from 'react'
+
 import { Button, IconButton, Theme, Toolbar, Tooltip, createStyles, makeStyles } from '@material-ui/core'
-import AddIcon from '@material-ui/icons/Add'
-import CreateIcon from '@material-ui/icons/CreateOutlined'
+import SearchIcon from "@material-ui/icons/Search";
+import StarIcon from "@material-ui/icons/Star";
+import CopyIcon from "@material-ui/icons/FileCopy";
 import DeleteIcon from '@material-ui/icons/DeleteOutline'
 import FilterListIcon from '@material-ui/icons/FilterList'
 import ViewColumnsIcon from '@material-ui/icons/ViewColumn'
-import classnames from 'classnames'
-import React, { MouseEvent, MouseEventHandler, PropsWithChildren, ReactElement, useCallback, useState } from 'react'
+
 import { TableInstance } from 'react-table'
+import classnames from 'classnames'
+
+import Count from '../Components/Count';
+import { ToolbarStyled, LeftIconsSection, RightIconsSection, Divider } from '../Components/BaseToolbar';
 
 import { TableMouseEventHandler } from '../../types/react-table-config'
 import { ColumnHidePage } from './ColumnHidePage'
 import { FilterPage } from './FilterPage'
+
 
 export const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -18,14 +25,16 @@ export const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'space-between',
     },
-    leftButtons: {},
-    rightButtons: {},
+    leftButtons: { },
+    rightButtons: { },
     leftIcons: {
+      color: 'white',
       '&:first-of-type': {
         marginLeft: -12,
       },
     },
     rightIcons: {
+      color: 'white',
       padding: 12,
       marginTop: '-6px',
       width: 48,
@@ -169,65 +178,85 @@ export function TableToolbar<T extends Record<string, unknown>>({
     setAnchorEl(undefined)
   }, [])
 
-  // toolbar with add, edit, delete, filter/search column select.
   return (
-    <Toolbar className={classes.toolbar}>
-      <div className={classes.leftButtons}>
+    <ToolbarStyled>
+      <LeftIconsSection>
         {onAdd && (
           <InstanceSmallIconActionButton<T>
             instance={instance}
-            icon={<AddIcon />}
+            icon={<SearchIcon />}
             onClick={onAdd}
-            label='Add'
-            enabled={({ state }: TableInstance<T>) =>
-              !state.selectedRowIds || Object.keys(state.selectedRowIds).length === 0
-            }
-            variant='left'
+            label="Search"
+            enabled={() => true}
+            variant="left"
           />
         )}
+
+        <SmallIconActionButton
+          icon={<FilterListIcon />}
+          onClick={handleFilterClick}
+          label="Filter by columnsFilter by columnsFilter by columnsFilter by columnsFilter by columns"
+          variant="right"
+        />
+
+        <Count icon={<StarIcon />} count={0} />
+
+        <Divider />
+
         {onEdit && (
           <InstanceSmallIconActionButton<T>
             instance={instance}
-            icon={<CreateIcon />}
+            icon={<CopyIcon />}
             onClick={onEdit}
-            label='Edit'
+            label="Edit"
             enabled={({ state }: TableInstance<T>) =>
-              state.selectedRowIds && Object.keys(state.selectedRowIds).length === 1
+              state.selectedRowIds &&
+              Object.keys(state.selectedRowIds).length === 1
             }
-            variant='left'
+            variant="left"
           />
         )}
+
+        <Divider />
+
         {onDelete && (
           <InstanceSmallIconActionButton<T>
             instance={instance}
             icon={<DeleteIcon />}
             onClick={onDelete}
-            label='Delete'
+            label="Delete"
             enabled={({ state }: TableInstance<T>) =>
-              state.selectedRowIds && Object.keys(state.selectedRowIds).length > 0
+              state.selectedRowIds &&
+              Object.keys(state.selectedRowIds).length > 0
             }
-            variant='left'
+            variant="left"
           />
         )}
-      </div>
-      <div className={classes.rightButtons}>
-        <ColumnHidePage<T> instance={instance} onClose={handleClose} show={columnsOpen} anchorEl={anchorEl} />
-        <FilterPage<T> instance={instance} onClose={handleClose} show={filterOpen} anchorEl={anchorEl} />
+
+        <FilterPage<T>
+          instance={instance}
+          onClose={handleClose}
+          show={filterOpen}
+          anchorEl={anchorEl}
+        />
+
+      </LeftIconsSection>
+      <RightIconsSection>
+        <ColumnHidePage<T>
+          instance={instance}
+          onClose={handleClose}
+          show={columnsOpen}
+          anchorEl={anchorEl}
+        />
         {hideableColumns.length > 1 && (
           <SmallIconActionButton
             icon={<ViewColumnsIcon />}
             onClick={handleColumnsClick}
-            label='Show / hide columns'
-            variant='right'
+            label="Show / hide columns"
+            variant="right"
           />
         )}
-        <SmallIconActionButton
-          icon={<FilterListIcon />}
-          onClick={handleFilterClick}
-          label='Filter by columnsFilter by columnsFilter by columnsFilter by columnsFilter by columns'
-          variant='right'
-        />
-      </div>
-    </Toolbar>
+      </RightIconsSection>
+    </ToolbarStyled>
   )
 }
