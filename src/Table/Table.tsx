@@ -28,7 +28,7 @@ import {
 
 import { camelToWords, useDebounce, useLocalStorage } from '../utils'
 import { FilterChipBar } from './FilterChipBar'
-import { fuzzyTextFilter, numericTextFilter } from './filters'
+import { fuzzyTextFilter, numericTextFilter, enumMatchFilter } from './filters'
 import { ResizeHandle } from './ResizeHandle'
 import { TablePagination } from './TablePagination'
 import {
@@ -197,6 +197,7 @@ const hooks = [
 const filterTypes = {
   fuzzyText: fuzzyTextFilter,
   numeric: numericTextFilter,
+  enumMatch: enumMatchFilter,
 }
 
 export function Table<T extends Record<string, unknown>>(props: PropsWithChildren<TableProperties<T>>): ReactElement {
