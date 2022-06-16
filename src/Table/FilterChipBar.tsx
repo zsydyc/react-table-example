@@ -56,11 +56,15 @@ export function FilterChipBar<T extends Record<string, unknown>>({
 
   const handleEnumDelete = useCallback(
     (id: string | number, enumType: string) => {
-      const newFilters = filters.find(f => f.id === id)?.value
+      let newFilters = filters.find(f => f.id === id)?.value
       delete newFilters[enumType]
+
+      // Unset filter to undefined or it will try to match
+      if (Object.keys(newFilters).length === 0) newFilters = undefined
+
       setFilter(id as IdType<T>, newFilters)
     },
-    [setFilter]
+    [setFilter, filters]
   )
 
   return Object.keys(filters).length > 0 ? (
@@ -74,7 +78,7 @@ export function FilterChipBar<T extends Record<string, unknown>>({
           // This is using an enum type
           if (typeof value === 'object') {
             return (
-              <>
+              <span key={column.id}>
                 {Object.keys(value).map((value: string) => (
                   <Chip
                     className={classes.filterChip}
@@ -89,7 +93,7 @@ export function FilterChipBar<T extends Record<string, unknown>>({
                     variant='outlined'
                   />
                 ))}
-              </>
+              </span>
             )
           }
 

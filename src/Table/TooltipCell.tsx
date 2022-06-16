@@ -7,7 +7,6 @@ import StarIcon from "@material-ui/icons/Star";
 
 import { css } from '@emotion/css'
 
-
 const truncated = css`
   text-overflow: ellipsis;
   overflow: hidden;

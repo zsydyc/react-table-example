@@ -168,7 +168,7 @@ export function NumberRangeColumnFilter({
 
 // We assume the enum is 0 indexed, and is auto incremented
 export function CheckboxColumnFilter({
-  column: { render, filterValue, setFilter, preFilteredRows, id },
+  column: { render, filterValue, setFilter, id },
 }: FilterProps<ExperimentData>) {
   // default render gives ReactElement, but is passed as an object
   const enumType = render('enumType') as Record<string, string>;
@@ -185,18 +185,23 @@ export function CheckboxColumnFilter({
           .map(([index, type]) => {
             return (
               <FormControlLabel
+                key={`${enumType}_${type}`}
                 control={
                   <Checkbox
-                    id={`id_${index}`}
+                    id={`${id}_${index}`}
                     name={type}
                     checked={filterValue?.[type]}
                     onChange={(e) => {
                       const val = e.target.checked
-                      const newFilterValue = (filterValue ?? {})
-                      if (val)
-                        newFilterValue[type] = val
-                      else
+                      let newFilterValue = (filterValue ?? {})
+
+                      if (!val) {
                         delete newFilterValue[type]
+                        // Unset filter to undefined or it will try to match
+                        if (Object.keys(newFilterValue).length === 0)
+                          newFilterValue = undefined
+                      } else newFilterValue[type] = val
+
                       setFilter(newFilterValue)
                     }}
                   />
