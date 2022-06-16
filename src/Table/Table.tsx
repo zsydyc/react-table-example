@@ -18,6 +18,7 @@ import {
   useExpanded,
   useFilters,
   useFlexLayout,
+  useGlobalFilter,
   useGroupBy,
   usePagination,
   useResizeColumns,
@@ -184,6 +185,7 @@ const defaultColumn = {
 const hooks = [
   useColumnOrder,
   useFilters,
+  useGlobalFilter,
   useGroupBy,
   useSortBy,
   useExpanded,
