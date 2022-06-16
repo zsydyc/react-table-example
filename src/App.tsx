@@ -1,6 +1,6 @@
 import { CssBaseline } from '@material-ui/core'
 import React, { useCallback } from 'react'
-import { CellProps, TableInstance } from 'react-table'
+import { TableInstance } from 'react-table'
 
 import { Page } from './Page'
 import { Table } from './Table'

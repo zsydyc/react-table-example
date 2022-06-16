@@ -1,7 +1,6 @@
-import React, { MouseEvent, MouseEventHandler, PropsWithChildren, ReactElement, useCallback, useState } from 'react'
+import { MouseEvent, MouseEventHandler, PropsWithChildren, ReactElement, useCallback, useState } from 'react'
 
-import { Button, IconButton, Theme, Toolbar, Tooltip, createStyles, makeStyles } from '@material-ui/core'
-import SearchIcon from "@material-ui/icons/Search";
+import { Button, IconButton, Tooltip, createStyles, makeStyles } from '@material-ui/core'
 import StarIcon from "@material-ui/icons/Star";
 import CopyIcon from "@material-ui/icons/FileCopy";
 import DeleteIcon from '@material-ui/icons/DeleteOutline'
@@ -11,15 +10,15 @@ import ViewColumnsIcon from '@material-ui/icons/ViewColumn'
 import { TableInstance } from 'react-table'
 import classnames from 'classnames'
 
-import Count from '../Components/Count';
 import { ToolbarStyled, LeftIconsSection, RightIconsSection, Divider } from '../Components/BaseToolbar';
+import Count from '../Components/Count';
+import Search from '../Components/Search';
 
 import { TableMouseEventHandler } from '../../types/react-table-config'
 import { ColumnHidePage } from './ColumnHidePage'
 import { FilterPage } from './FilterPage'
 
-
-export const useStyles = makeStyles((theme: Theme) =>
+export const useStyles = makeStyles(() =>
   createStyles({
     toolbar: {
       display: 'flex',
@@ -145,12 +144,10 @@ type TableToolbarProps<T extends Record<string, unknown>> = {
 
 export function TableToolbar<T extends Record<string, unknown>>({
   instance,
-  onAdd,
   onDelete,
   onEdit,
 }: PropsWithChildren<TableToolbarProps<T>>): ReactElement | null {
   const { columns } = instance
-  const classes = useStyles()
   const [anchorEl, setAnchorEl] = useState<Element | undefined>(undefined)
   const [columnsOpen, setColumnsOpen] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
@@ -181,16 +178,7 @@ export function TableToolbar<T extends Record<string, unknown>>({
   return (
     <ToolbarStyled>
       <LeftIconsSection>
-        {onAdd && (
-          <InstanceSmallIconActionButton<T>
-            instance={instance}
-            icon={<SearchIcon />}
-            onClick={onAdd}
-            label="Search"
-            enabled={() => true}
-            variant="left"
-          />
-        )}
+        <Search instance={instance} />
 
         <SmallIconActionButton
           icon={<FilterListIcon />}

@@ -4,7 +4,6 @@ export * from './fuzzyFilter'
 export * from './numericFilter'
 export * from './enumMatchFilter'
 
-// TODO move to own file?
 export function filterGreaterThan(rows: Array<Row<any>>, id: Array<IdType<any>>, filterValue: FilterValue) {
   return rows.filter((row) => {
     const rowValue = row.values[id[0]]
