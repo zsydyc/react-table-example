@@ -15,6 +15,7 @@ const columns = [
         width: 50,
         minWidth: 50,
         disableFilters: true,
+        disableSortBy: true,
       },
       {
         Header: 'Name',

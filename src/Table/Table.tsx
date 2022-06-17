@@ -1,7 +1,7 @@
 import { TableSortLabel, TextField, Tooltip } from '@material-ui/core'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp'
-import React, { CSSProperties, MouseEventHandler, PropsWithChildren, ReactElement, useEffect } from 'react'
+import React, { CSSProperties, MouseEventHandler, PropsWithChildren, ReactElement, useEffect, useRef } from 'react'
 import {
   Cell,
   CellProps,
@@ -41,9 +41,11 @@ import {
   TableHeadCell,
   TableHeadRow,
   TableLabel,
-  TableRow,
+  // TableRow,
   TableTable,
 } from './TableStyles'
+
+import ContextMenu from "./ContextMenu";
 import { TableToolbar } from './TableToolbar'
 import { TooltipCellRenderer } from './TooltipCell'
 
@@ -205,7 +207,11 @@ const filterTypes = {
 export function Table<T extends Record<string, unknown>>(props: PropsWithChildren<TableProperties<T>>): ReactElement {
   const { name, columns, onAdd, onDelete, onEdit, onClick } = props;
 
-  const [initialState, setInitialState] = useLocalStorage(`tableState:${name}`, {})
+  const [initialState, setInitialState] = useLocalStorage(`tableState:${name}`, {});
+  // context menu
+  const tableRowRef = useRef(null);
+  // todo: define other options
+  const contextMenuOptions = {'showFavorite': true};
   const instance = useTable<T>(
     {
       ...props,
@@ -253,26 +259,12 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
             return (
               <TableHeadRow key={headerGroupKey} {...getHeaderGroupProps}>
                 {headerGroup.headers.map((column) => {
-                  const style = {
-                    textAlign: column.align ? column.align : 'left ',
-                  } as CSSProperties
+                  
                   const { key: headerKey, role: headerRole, ...getHeaderProps } = column.getHeaderProps(headerProps)
-                  const { title: groupTitle = '', ...columnGroupByProps } = column.getGroupByToggleProps()
                   const { title: sortTitle = '', ...columnSortByProps } = column.getSortByToggleProps()
 
                   return (
                     <TableHeadCell key={headerKey} {...getHeaderProps}>
-                      {column.canGroupBy && (
-                        <Tooltip title={groupTitle}>
-                          <TableSortLabel
-                            active
-                            direction={column.isGrouped ? 'desc' : 'asc'}
-                            IconComponent={KeyboardArrowRight}
-                            {...columnGroupByProps}
-                            className={headerIcon}
-                          />
-                        </Tooltip>
-                      )}
                       {column.canSort ? (
                         <Tooltip title={sortTitle}>
                           <TableSortLabel
@@ -280,15 +272,13 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
                             direction={column.isSortedDesc ? 'desc' : 'asc'}
                             {...columnSortByProps}
                             className={tableSortLabel}
-                            style={style}
                           >
                             {column.render('Header')}
                           </TableSortLabel>
                         </Tooltip>
                       ) : (
-                        <TableLabel style={style}>{column.render('Header')}</TableLabel>
+                        <TableLabel>{column.render('Header')}</TableLabel>
                       )}
-                      {/*<div>{column.canFilter ? column.render('Filter') : null}</div>*/}
                       {column.canResize && <ResizeHandle column={column} />}
                     </TableHeadCell>
                   )
@@ -299,11 +289,14 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
         </TableHead>
         <TableBody {...getTableBodyProps()}>
           {page.map((row) => {
-            prepareRow(row)
-            const { key: rowKey, role: rowRole, ...getRowProps } = row.getRowProps()
+            prepareRow(row);
+            const { key: rowKey, role: rowRole, ...getRowProps } = row.getRowProps();
             return (
-              <TableRow
+              <tr
                 key={rowKey}
+                data-name={row.original.name}
+                data-status={row.original.stauts}
+                ref={tableRowRef} 
                 {...getRowProps}
                 className={cx(
                   {'rowSelected': row.isSelected}
@@ -336,12 +329,13 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
                     </TableCell>
                   )
                 })}
-              </TableRow>
+              </tr>
             )
           })}
         </TableBody>
       </TableTable>
       <TablePagination<T> instance={instance} />
+      <ContextMenu outerRef={tableRowRef} options={contextMenuOptions}/>
     </>
   )
 }

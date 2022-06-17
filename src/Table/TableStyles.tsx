@@ -81,6 +81,27 @@ const tableCell = css`
   }
 `;
 
+// context menu styling
+export const contextMenuStyle = css`
+  padding: 10px;
+  border: solid thin;
+  background-color: #fff;
+  border-radius: 2px;
+  padding-left: 0;
+  margin: 0;
+  position: absolute;
+  list-style: none;
+  li {
+    padding: 0.2em 1em;
+    color: #000;
+    cursor: pointer;
+    &:hover {
+      background-color: #f2f2f2;
+    }
+  }
+`;
+
+
 const areEqual = (prevProps: any, nextProps: any) =>
   prevProps.checked === nextProps.checked && prevProps.indeterminate === nextProps.indeterminate
 
