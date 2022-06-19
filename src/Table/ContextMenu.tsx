@@ -1,21 +1,20 @@
-import React from "react";
-
-import useContextMenu from "../utils/useContextMenu";
 import { contextMenuStyle } from './TableStyles';
 
 interface ContextMenuProps {
-  outerRef: React.RefObject<HTMLElement>
-  options: {showFavorite?: boolean};
+  position: {x: number; y: number};
+  rowName : string;
+  status?: string;
+  options?: {showFavorite?: boolean};
 }
 
-const ContextMenu = ({ outerRef, options }: ContextMenuProps) => {
-  const { xPos, yPos, menu, name } = useContextMenu(outerRef);
-  const {showFavorite = true} = options;
+const ContextMenu = ({ position, status, rowName, options }: ContextMenuProps) => {
+  const { x, y } = position;
+  // const {showFavorite = true} = options;
 
-  if (menu) {
+  if (x!==0 && y!==0) {
     return (
-      <ul className={contextMenuStyle} style={{ top: yPos, left: xPos }}>
-        <li>{name}</li>
+      <ul className={contextMenuStyle} style={{ top: `${y}px`, left: `${x}px` }}>
+        <li>{rowName}</li>
         <li><hr /></li>
         <li>View in this tab</li>
         <li>View in New tab</li>

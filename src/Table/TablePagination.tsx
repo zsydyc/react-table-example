@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback, PropsWithChildren, ReactElement } from 'react';
-// import { cx } from 'emotion';
 import { TableInstance } from 'react-table'
 
 

@@ -1,16 +1,10 @@
-import { TableSortLabel, TextField, Tooltip } from '@material-ui/core'
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
-import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp'
-import React, { CSSProperties, MouseEventHandler, PropsWithChildren, ReactElement, useEffect, useRef } from 'react'
+import React, { MouseEventHandler, PropsWithChildren, ReactElement, useEffect } from 'react'
 import {
-  Cell,
   CellProps,
   ColumnInstance,
   FilterProps,
-  HeaderGroup,
   HeaderProps,
   Hooks,
-  Meta,
   Row,
   TableInstance,
   TableOptions,
@@ -30,58 +24,20 @@ import {
 import { camelToWords, useDebounce, useLocalStorage } from '../utils'
 import { FilterChipBar } from './FilterChipBar'
 import { fuzzyTextFilter, numericTextFilter, enumMatchFilter } from './filters'
-import { ResizeHandle } from './ResizeHandle'
+
 import { TablePagination } from './TablePagination'
+import { TableBody } from './TableBody'
+import { TableHeader } from './TableHeader'
+
+// todo: cleanup this
 import {
   HeaderCheckbox,
   RowCheckbox,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeadCell,
-  TableHeadRow,
-  TableLabel,
-  // TableRow,
-  TableTable,
 } from './TableStyles'
+import { TextField } from '@material-ui/core'
 
-import ContextMenu from "./ContextMenu";
 import { TableToolbar } from './TableToolbar'
 import { TooltipCellRenderer } from './TooltipCell'
-
-import { cx, css } from '@emotion/css'
-const tableSortLabel = css`
-    & svg {
-      width: 16px;
-      height: 16px;
-      margin-top: 0px;
-      margin-left: 2px;
-    }
-`;
-
-const headerIcon = css`
-  & svg {
-    width: 16px;
-    height: 16px;
-    margin-top: 4px;
-    margin-right: 0px;
-  }
-`;
-
-const iconDirectionAsc = css`
-  transform: rotate(90deg);
-`;
-const iconDirectionDesc = css`
-  transform: rotate(180deg);
-`;
-const cellIcon = css`
-  & svg {
-    width: 16px;
-    height: 16px;
-    margin-top: 3px;
-  }
-`;
-
 
 
 export interface TableProperties<T extends Record<string, unknown>> extends TableOptions<T> {
@@ -128,17 +84,6 @@ function DefaultColumnFilter<T extends Record<string, unknown>>({ columns, colum
   )
 }
 
-const getStyles = (props: any, disableResizing = false, align = 'left') => [
-  props,
-  {
-    style: {
-      justifyContent: align === 'right' ? 'flex-end' : 'flex-start',
-      alignItems: 'flex-start',
-      display: 'flex',
-    },
-  },
-]
-
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.allColumns.push((columns) => [
     // Let's make a column for selection
@@ -168,11 +113,6 @@ const selectionHook = (hooks: Hooks<any>) => {
   })
 }
 
-const headerProps = <T extends Record<string, unknown>>(props: any, { column }: Meta<T, { column: HeaderGroup<T> }>) =>
-  getStyles(props, column && column.disableResizing, column && column.align)
-
-const cellProps = <T extends Record<string, unknown>>(props: any, { cell }: Meta<T, { cell: Cell<T> }>) =>
-  getStyles(props, cell.column && cell.column.disableResizing, cell.column && cell.column.align)
 
 const defaultColumn = {
   Filter: DefaultColumnFilter,
@@ -205,13 +145,9 @@ const filterTypes = {
 }
 
 export function Table<T extends Record<string, unknown>>(props: PropsWithChildren<TableProperties<T>>): ReactElement {
-  const { name, columns, onAdd, onDelete, onEdit, onClick } = props;
-
+  const { name, columns, onAdd, onDelete, onEdit } = props;
   const [initialState, setInitialState] = useLocalStorage(`tableState:${name}`, {});
-  // context menu
-  const tableRowRef = useRef(null);
-  // todo: define other options
-  const contextMenuOptions = {'showFavorite': true};
+
   const instance = useTable<T>(
     {
       ...props,
@@ -223,8 +159,8 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
     ...hooks
   )
 
-  const { getTableProps, headerGroups, getTableBodyProps, page, prepareRow, state } = instance
-  const debouncedState = useDebounce(state, 500)
+  const { getTableProps, state } = instance
+  const debouncedState = useDebounce(state, 500);
 
   useEffect(() => {
     const { sortBy, filters, pageSize, columnResizing, hiddenColumns } = debouncedState
@@ -236,106 +172,20 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
       hiddenColumns,
     }
     setInitialState(val)
-  }, [setInitialState, debouncedState])
+  }, [setInitialState, debouncedState]);
 
-  const cellClickHandler = (cell: Cell<T>) => () => {
-    onClick && !cell.column.isGrouped && !cell.row.isGrouped && cell.column.id !== '_selector' && onClick(cell.row)
-  }
 
   const { role: tableRole, ...tableProps } = getTableProps()
   return (
     <>
       <TableToolbar instance={instance} {...{ onAdd, onDelete, onEdit }} />
       <FilterChipBar<T> instance={instance} />
-      <TableTable {...tableProps}>
-        <TableHead>
-          {headerGroups.map((headerGroup) => {
-            const {
-              key: headerGroupKey,
-              title: headerGroupTitle,
-              role: headerGroupRole,
-              ...getHeaderGroupProps
-            } = headerGroup.getHeaderGroupProps()
-            return (
-              <TableHeadRow key={headerGroupKey} {...getHeaderGroupProps}>
-                {headerGroup.headers.map((column) => {
-                  
-                  const { key: headerKey, role: headerRole, ...getHeaderProps } = column.getHeaderProps(headerProps)
-                  const { title: sortTitle = '', ...columnSortByProps } = column.getSortByToggleProps()
-
-                  return (
-                    <TableHeadCell key={headerKey} {...getHeaderProps}>
-                      {column.canSort ? (
-                        <Tooltip title={sortTitle}>
-                          <TableSortLabel
-                            active={column.isSorted}
-                            direction={column.isSortedDesc ? 'desc' : 'asc'}
-                            {...columnSortByProps}
-                            className={tableSortLabel}
-                          >
-                            {column.render('Header')}
-                          </TableSortLabel>
-                        </Tooltip>
-                      ) : (
-                        <TableLabel>{column.render('Header')}</TableLabel>
-                      )}
-                      {column.canResize && <ResizeHandle column={column} />}
-                    </TableHeadCell>
-                  )
-                })}
-              </TableHeadRow>
-            )
-          })}
-        </TableHead>
-        <TableBody {...getTableBodyProps()}>
-          {page.map((row) => {
-            prepareRow(row);
-            const { key: rowKey, role: rowRole, ...getRowProps } = row.getRowProps();
-            return (
-              <tr
-                key={rowKey}
-                data-name={row.original.name}
-                data-status={row.original.stauts}
-                ref={tableRowRef} 
-                {...getRowProps}
-                className={cx(
-                  {'rowSelected': row.isSelected}
-                )}
-              >
-                {row.cells.map((cell) => {
-                  const { key: cellKey, role: cellRole, ...getCellProps } = cell.getCellProps(cellProps)
-                  return (
-                    <TableCell key={cellKey} {...getCellProps} onClick={cellClickHandler(cell)}>
-                      {cell.isGrouped ? (
-                        <>
-                          <TableSortLabel
-                            classes={{
-                              iconDirectionAsc: iconDirectionAsc,
-                              iconDirectionDesc: iconDirectionDesc,
-                            }}
-                            active
-                            direction={row.isExpanded ? 'desc' : 'asc'}
-                            IconComponent={KeyboardArrowUp}
-                            {...row.getToggleRowExpandedProps()}
-                            className={cellIcon}
-                          />{' '}
-                          {cell.render('Cell', { editable: false })} ({row.subRows.length})
-                        </>
-                      ) : cell.isAggregated ? (
-                        cell.render('Aggregated')
-                      ) : cell.isPlaceholder ? null : (
-                        cell.render('Cell')
-                      )}
-                    </TableCell>
-                  )
-                })}
-              </tr>
-            )
-          })}
-        </TableBody>
-      </TableTable>
+      <table {...tableProps} >
+        <TableHeader<T> instance={instance} />
+        <TableBody<T> instance={instance} />
+      </table>
       <TablePagination<T> instance={instance} />
-      <ContextMenu outerRef={tableRowRef} options={contextMenuOptions}/>
+
     </>
   )
 }
