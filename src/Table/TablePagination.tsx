@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback, PropsWithChildren, ReactElement } from 'react';
+import { PropsWithChildren, ReactElement } from 'react';
 import { TableInstance } from 'react-table'
 
+// todo: input icons for pagination
 
 function TablePagination<T extends Record<string, unknown>>({
   instance,
@@ -20,37 +21,7 @@ function TablePagination<T extends Record<string, unknown>>({
 
   return (
     <div className="pagination">
-      <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-        {'<<'}
-      </button>{' '}
-      <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-        {'<'}
-      </button>{' '}
-      <button onClick={() => nextPage()} disabled={!canNextPage}>
-        {'>'}
-      </button>{' '}
-      <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-        {'>>'}
-      </button>{' '}
-      <span>
-        Page{' '}
-        <strong>
-          {pageIndex + 1} of {pageOptions.length}
-        </strong>{' '}
-      </span>
-      <span>
-        | Go to page:{' '}
-        <input
-          type="number"
-          defaultValue={pageIndex + 1}
-          onChange={e => {
-            const page = e.target.value ? Number(e.target.value) - 1 : 0
-            gotoPage(page)
-          }}
-          style={{ width: '100px' }}
-        />
-      </span>{' '}
-      <select
+      <span> Experiments per page <select
         value={pageSize}
         onChange={e => {
           setPageSize(Number(e.target.value))
@@ -58,10 +29,29 @@ function TablePagination<T extends Record<string, unknown>>({
       >
         {[10, 20, 30, 40, 50].map(pageSize => (
           <option key={pageSize} value={pageSize}>
-            Show {pageSize}
+            {pageSize}
           </option>
         ))}
-      </select>
+      </select></span>
+      
+      <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+        {'<<'}
+      </button>
+      <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+        {'<'}
+      </button>
+      <button onClick={() => nextPage()} disabled={!canNextPage}>
+        {'>'}
+      </button>
+      <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+        {'>>'}
+      </button>
+      <span>
+        <strong>
+          {pageIndex + 1} - {pageOptions.length} of {pageCount * pageSize}
+        </strong>
+      </span>
+      
     </div>);
 
 }

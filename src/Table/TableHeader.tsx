@@ -1,34 +1,13 @@
-import { useEffect, useState, useCallback, PropsWithChildren, ReactElement, useRef } from 'react';
-
-// todo: replace tooltip with popup component from Bloom
-import { Tooltip, TableSortLabel } from '@material-ui/core'
+import { PropsWithChildren, ReactElement } from 'react';
 
 import {
   TableInstance,
 } from 'react-table';
 import { ResizeHandle } from './ResizeHandle'
 
-
-// todo: clean this
-import {
-  TableLabel,
-} from './TableStyles'
-
-import { css } from '@emotion/css'
-
-const tableSortLabel = css`
-    & svg {
-      width: 16px;
-      height: 16px;
-      margin-top: 0px;
-      margin-left: 2px;
-    }
-`;
-
 function TableHeader<T extends Record<string, unknown>>({
   instance,
 }: PropsWithChildren<{ instance: TableInstance<T> }>): ReactElement | null {
-
   const {
     headerGroups
   } = instance;
@@ -46,25 +25,23 @@ function TableHeader<T extends Record<string, unknown>>({
           <tr key={headerGroupKey} {...getHeaderGroupProps}>
             {headerGroup.headers.map((column) => {
 
-              const { key: headerKey, role: headerRole, ...getHeaderProps } = column.getHeaderProps()
-              const { title: sortTitle = '', ...columnSortByProps } = column.getSortByToggleProps()
+              const { key: headerKey, role: headerRole, ...getHeaderProps } = column.getHeaderProps();
+
+              const { onClick } = column.getSortByToggleProps();
 
               return (
                 <td key={headerKey} {...getHeaderProps}>
                   {column.canSort ? (
-                    <Tooltip title={sortTitle}>
-                      <TableSortLabel
-                        active={column.isSorted}
-                        direction={column.isSortedDesc ? 'desc' : 'asc'}
-                        {...columnSortByProps}
-                        className={tableSortLabel}
-                      >
-                        {column.render('Header')}
-                      </TableSortLabel>
-                    </Tooltip>
+                    <span onClick={onClick}>
+                      {column.render('Header')} 
+                      {/* todo: replace this by icon  */}
+                      {column.isSorted && <span> {column.isSortedDesc ? 'desc' : 'asc'}</span> }
+                    </span>
+                    
                   ) : (
-                    <TableLabel>{column.render('Header')}</TableLabel>
+                    <span>{column.render('Header')}</span>
                   )}
+
                   {column.canResize && <ResizeHandle column={column} />}
                 </td>
               )
@@ -74,9 +51,6 @@ function TableHeader<T extends Record<string, unknown>>({
       })}
     </thead>
   );
-
 }
-
-
 
 export { TableHeader };

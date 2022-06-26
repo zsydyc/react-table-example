@@ -29,13 +29,6 @@ import { TablePagination } from './TablePagination'
 import { TableBody } from './TableBody'
 import { TableHeader } from './TableHeader'
 
-// todo: cleanup this
-import {
-  HeaderCheckbox,
-  RowCheckbox,
-} from './TableStyles'
-import { TextField } from '@material-ui/core'
-
 import { TableToolbar } from './TableToolbar'
 import { TooltipCellRenderer } from './TooltipCell'
 
@@ -69,18 +62,21 @@ function DefaultColumnFilter<T extends Record<string, unknown>>({ columns, colum
 
   const isFirstColumn = findFirstColumn(columns) === column
   return (
-    <TextField
-      name={id}
-      label={render('Header')}
-      InputLabelProps={{ htmlFor: id }}
-      value={value}
-      autoFocus={isFirstColumn}
-      variant='standard'
-      onChange={handleChange}
-      onBlur={(e) => {
-        setFilter(e.target.value || undefined)
-      }}
-    />
+    <>
+      <label htmlFor={id}>
+        {render('Header')}</label>
+        <input
+          name={id}
+          id={id}
+          value={value}
+          autoFocus={isFirstColumn}
+          // variant='standard'
+          onChange={handleChange}
+          onBlur={(e) => {
+            setFilter(e.target.value || undefined)
+          }}
+        />
+    </>
   )
 }
 
@@ -98,11 +94,11 @@ const selectionHook = (hooks: Hooks<any>) => {
       // The header can use the table's getToggleAllRowsSelectedProps method
       // to render a checkbox
       Header: ({ getToggleAllRowsSelectedProps }: HeaderProps<any>) => (
-        <HeaderCheckbox {...getToggleAllRowsSelectedProps()} />
+        <input type="checkbox" {...getToggleAllRowsSelectedProps()} />
       ),
       // The cell can use the individual row's getToggleRowSelectedProps method
       // to the render a checkbox
-      Cell: ({ row }: CellProps<any>) => <RowCheckbox {...row.getToggleRowSelectedProps()} />,
+      Cell: ({ row }: CellProps<any>) => <input type="checkbox" {...row.getToggleRowSelectedProps()} />,
     },
     ...columns,
   ])

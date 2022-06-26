@@ -1,14 +1,5 @@
 import { useEffect, useState } from 'react'
-import styled from '@emotion/styled'
-import SearchIcon from '@material-ui/icons/Search'
-import {TextField} from '@material-ui/core'
 import {TableInstance} from 'react-table'
-
-const SearchArticle = styled.article`
-  background: rgba(255, 255, 255, 0.15);
-  padding: 0.5em;
-  border-radius: 1em;
-`
 
 interface SearchProps<T extends Record<string, unknown>> {
   instance: TableInstance<T>;
@@ -23,16 +14,24 @@ const Search = <T extends Record<string, unknown>>({ instance }: SearchProps<T>)
     () => { console.log('setting filter'); setGlobalFilter(search) },
     [search, setGlobalFilter]
   );
+  
+  const clearSearch = () => {
+    setSearch('');
+  }
 
   return (
-    <SearchArticle>
-      <SearchIcon />
-      <TextField
+    <>
+{/* // todo: repalce this with search icon */}
+      <span style={{color: "white"}}>ICON</span>
+      <input
         name={'search'}
         value={search}
         onChange={e => setSearch(e.target.value)}
       />
-    </SearchArticle>
+      {/* todo: remove seach icon click  */}
+      {/* todo: replace with str has length function  */}
+      {search && <span style={{color: "white"}} onClick={clearSearch}>X</span>}
+    </>
   )
 }
 

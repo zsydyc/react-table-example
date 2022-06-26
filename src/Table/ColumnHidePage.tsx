@@ -1,16 +1,11 @@
-import { Checkbox, FormControlLabel, Popover, Typography, createStyles, makeStyles } from '@material-ui/core'
-import React, { ReactElement } from 'react'
+import { FormControlLabel, Popover, createStyles, makeStyles } from '@material-ui/core'
+import { ReactElement } from 'react'
 import { TableInstance } from 'react-table'
 
 const useStyles = makeStyles(
   createStyles({
     columnsPopOver: {
       padding: 24,
-    },
-    popoverTitle: {
-      fontWeight: 500,
-      padding: '0 24px 24px 0',
-      textTransform: 'uppercase',
     },
     grid: {
       display: 'grid',
@@ -64,12 +59,12 @@ export function ColumnHidePage<T extends Record<string, unknown>>({
         }}
       >
         <div className={classes.columnsPopOver}>
-          <Typography className={classes.popoverTitle}>Visible Columns</Typography>
+          <h2>Columns</h2>
           <div className={classes.grid}>
             {hideableColumns.map((column) => (
               <FormControlLabel
                 key={column.id}
-                control={<Checkbox value={`${column.id}`} disabled={column.isVisible && onlyOneOptionLeft} />}
+                control={<input type="checkbox" value={`${column.id}`} disabled={column.isVisible && onlyOneOptionLeft} />}
                 label={column.render('Header')}
                 checked={column.isVisible}
                 onChange={() => toggleHideColumn(column.id, column.isVisible)}

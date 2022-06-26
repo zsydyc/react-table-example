@@ -38,10 +38,6 @@ Other features:
 
  - Clean up `styled` from `@material-ui/core` (TableStyles.tsx)
  - Remove the dependency from MUI, find the alternatives for the following:
-    - Checkbox 
-    - Tooltip 
-    - TableSortLabel
-    - TextField
     - MUI icons
 
  - The current example is using MUI 4, if we have to use MUI components (e.g. Popover), we need to upgrade to MUI 5.

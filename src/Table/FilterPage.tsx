@@ -1,21 +1,14 @@
-import { Button, Popover, Typography, createStyles, makeStyles } from '@material-ui/core'
-import React, { FormEvent, ReactElement, useCallback } from 'react'
+import { Popover, createStyles, makeStyles } from '@material-ui/core'
+import { FormEvent, ReactElement, useCallback } from 'react'
 import { TableInstance } from 'react-table'
 
+import { filterResetButton } from './TableStyles';
+
+// todo: clean this style 
 const useStyles = makeStyles(
   createStyles({
     columnsPopOver: {
       padding: 24,
-    },
-    filtersResetButton: {
-      position: 'absolute',
-      top: 18,
-      right: 21,
-    },
-    popoverTitle: {
-      fontWeight: 500,
-      padding: '0 24px 24px 0',
-      textTransform: 'uppercase',
     },
     grid: {
       display: 'grid',
@@ -30,9 +23,6 @@ const useStyles = makeStyles(
       width: '100%',
       display: 'inline-flex',
       flexDirection: 'column',
-    },
-    hidden: {
-      display: 'none',
     },
   })
 )
@@ -62,7 +52,8 @@ export function FilterPage<T extends Record<string, unknown>>({
   )
 
   const resetFilters = useCallback(() => {
-    setAllFilters([])
+    setAllFilters([]);
+    onClose();
   }, [setAllFilters])
 
   return (
@@ -82,11 +73,9 @@ export function FilterPage<T extends Record<string, unknown>>({
         }}
       >
         <div className={classes.columnsPopOver}>
-          <Typography className={classes.popoverTitle}>Filters</Typography>
+          <h2>Filters</h2>
           <form onSubmit={onSubmit}>
-            <Button className={classes.filtersResetButton} color='primary' onClick={resetFilters}>
-              Reset
-            </Button>
+            
             <div className={classes.grid}>
               {allColumns
                 .filter((it) => it.canFilter)
@@ -96,9 +85,9 @@ export function FilterPage<T extends Record<string, unknown>>({
                   </div>
                 ))}
             </div>
-            <Button className={classes.hidden} type={'submit'}>
-              &nbsp;
-            </Button>
+            <button className={filterResetButton}  onClick={resetFilters}>
+              Reset
+            </button>
           </form>
         </div>
       </Popover>

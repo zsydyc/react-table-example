@@ -1,4 +1,23 @@
-import { contextMenuStyle } from './TableStyles';
+import { css } from '@emotion/css';
+
+export const contextMenuStyle = css`
+  padding: 10px;
+  border: solid thin;
+  background-color: #fff;
+  border-radius: 2px;
+  padding-left: 0;
+  margin: 0;
+  position: absolute;
+  list-style: none;
+  li {
+    padding: 0.2em 1em;
+    color: #000;
+    cursor: pointer;
+    &:hover {
+      background-color: #f2f2f2;
+    }
+  }
+`;
 
 interface ContextMenuProps {
   position: {x: number; y: number};
@@ -9,7 +28,6 @@ interface ContextMenuProps {
 
 const ContextMenu = ({ position, status, rowName, options }: ContextMenuProps) => {
   const { x, y } = position;
-  // const {showFavorite = true} = options;
 
   if (x!==0 && y!==0) {
     return (
@@ -29,7 +47,7 @@ const ContextMenu = ({ position, status, rowName, options }: ContextMenuProps) =
       </ul>
     );
   }
-  return <></>;
+  return null;
 };
 
 export default ContextMenu;

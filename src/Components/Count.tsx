@@ -1,16 +1,10 @@
-import React, { ReactElement } from "react";
+import  { ReactElement } from "react";
 import styled from "@emotion/styled";
 
 type CountProps =
-  // | {
-  //     count: number;
-  //     title: string | ReactElement;
-  //     icon: never;
-  //   }
-  // | {
   {
-      count: number;
-      icon: ReactElement;
+      count: string;
+      icon?: ReactElement;
       title?: string | ReactElement;
       // title?: never;
     };

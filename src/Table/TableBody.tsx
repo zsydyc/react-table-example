@@ -1,6 +1,5 @@
-import {  useState, PropsWithChildren, ReactElement } from 'react';
-import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp'
-import { TableSortLabel } from '@material-ui/core'
+import { useState, PropsWithChildren, ReactElement, useEffect } from 'react';
+
 import {
   TableInstance,
 } from 'react-table';
@@ -8,19 +7,19 @@ import {
 import ContextMenu from "./ContextMenu";
 import { cx, css } from '@emotion/css'
 
-const iconDirectionAsc = css`
-  transform: rotate(90deg);
-`;
-const iconDirectionDesc = css`
-  transform: rotate(180deg);
-`;
-const cellIcon = css`
-  & svg {
-    width: 16px;
-    height: 16px;
-    margin-top: 3px;
-  }
-`;
+// const iconDirectionAsc = css`
+//   transform: rotate(90deg);
+// `;
+// const iconDirectionDesc = css`
+//   transform: rotate(180deg);
+// `;
+// const cellIcon = css`
+//   & svg {
+//     width: 16px;
+//     height: 16px;
+//     margin-top: 3px;
+//   }
+// `;
 
 const tableBodyStyle = css`
   td {
@@ -37,18 +36,37 @@ function TableBody<T extends Record<string, unknown>>({
     page, prepareRow,
   } = instance;
 
+    // todo: since some table doesn't need to show context menu may need a flag (boolean) to control table show/hide
+  const [showContextMenu, setShowChotextMenu] = useState(false);
   const [contextMenuPosition, setContentMenuPosition] = useState({x: 0, y: 0});
   const [selectRowName, setSelectRowName] = useState('');
 
   const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>, name: string, status: string) => {
     e.preventDefault();
-    setContentMenuPosition({x:  e.pageX,y: e.pageY});
+    setContentMenuPosition({x: e.pageX, y: e.pageY});
     setSelectRowName(name);
+    setShowChotextMenu(true);
   }
 
-  // todo: may need options for different type of table
-  const contextMenuOptions = { 'showFavorite': true };
+  const handleClickOutside = () => {
+    setContentMenuPosition({x:0, y: 0});
+    setSelectRowName('');
+    setShowChotextMenu(false);
+  }
 
+  useEffect(() => {
+    // Bind the event listener
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener('click', handleClickOutside);
+    };
+  });
+
+  // todo: may need to pass an options object for different type of table (e.g. Exp Table / Run Table)
+
+  const contextMenuOptions = { 'showFavorite': true };
 
   return (
     <>
@@ -61,7 +79,6 @@ function TableBody<T extends Record<string, unknown>>({
               key={rowKey}
               data-name={row.original.name}
               data-status={row.original.stauts}
-              // ref={tableRowRef}
               onContextMenu={(e)=>handleContextMenu(e, row.original.name as string, row.original.stauts as string )}
               {...getRowProps}
               className={cx(
@@ -72,9 +89,12 @@ function TableBody<T extends Record<string, unknown>>({
                 const { key: cellKey, role: cellRole, ...getCellProps } = cell.getCellProps()
                 return (
                   <td key={cellKey} {...getCellProps} >
-                    {cell.isGrouped ? (
+                    {/* todo: clean up this, add grouping support,  */}
+                    {/* todo: remove MUI dependency 
+                    // import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp'
+                    // import { TableSortLabel } from '@material-ui/core' */}
+                    {/* {cell.isGrouped ? (
                       <>
-                        {/* todo: clean up this, remove mui dependency  */}
                         <TableSortLabel
                           classes={{
                             iconDirectionAsc: iconDirectionAsc,
@@ -92,7 +112,8 @@ function TableBody<T extends Record<string, unknown>>({
                       cell.render('Aggregated')
                     ) : cell.isPlaceholder ? null : (
                       cell.render('Cell')
-                    )}
+                    )} */}
+                    {cell.render('Cell')}
                   </td>
                 )
               })}
@@ -100,7 +121,7 @@ function TableBody<T extends Record<string, unknown>>({
           )
         })}
       </tbody>
-      <ContextMenu position={contextMenuPosition} rowName={selectRowName} options={contextMenuOptions} />
+      {showContextMenu && <ContextMenu position={contextMenuPosition} rowName={selectRowName} options={contextMenuOptions} />}
     </>
   );
 

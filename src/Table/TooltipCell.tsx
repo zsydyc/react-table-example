@@ -1,9 +1,5 @@
-// todo: need to replace MUI tooltip
-import { Tooltip as MuiTooltip } from '@material-ui/core'
 import React, { CSSProperties } from 'react'
 import { CellProps } from 'react-table'
-
-import StarIcon from "@material-ui/icons/Star";
 
 import { css } from '@emotion/css'
 
@@ -24,12 +20,10 @@ interface TooltipProps {
 }
 
 export const TooltipCell: React.FC<TooltipProps> = ({ text, tooltip = text, align }) => {
-  const tooltipTitle = typeof tooltip === 'boolean'
-    ? <StarIcon />
-    : tooltip;
   return (
-    <MuiTooltip title={tooltipTitle} className={truncated} style={{ textAlign: align } as CSSProperties}>
+    <div className={truncated} style={{ textAlign: align } as CSSProperties}>
+      {/* todo: since we are truncated data, may need to add tooltip  */}
       <span>{text}</span>
-    </MuiTooltip>
+    </div>
   )
 }
