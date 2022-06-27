@@ -3,7 +3,10 @@ import { PropsWithChildren, ReactElement } from 'react';
 import {
   TableInstance,
 } from 'react-table';
-import { ResizeHandle } from './ResizeHandle'
+import { ResizeHandle } from './ResizeHandle';
+import { tableHeadRow } from './styles';
+import { ReactComponent as UpIcon  } from '../Icons/Caret_up.svg';
+import { ReactComponent as DownIcon  } from '../Icons/Caret_down.svg';
 
 function TableHeader<T extends Record<string, unknown>>({
   instance,
@@ -13,7 +16,7 @@ function TableHeader<T extends Record<string, unknown>>({
   } = instance;
 
   return (
-    <thead>
+    <thead className={tableHeadRow}>
       {headerGroups.map((headerGroup) => {
         const {
           key: headerGroupKey,
@@ -32,10 +35,9 @@ function TableHeader<T extends Record<string, unknown>>({
               return (
                 <td key={headerKey} {...getHeaderProps}>
                   {column.canSort ? (
-                    <span onClick={onClick}>
+                    <span onClick={onClick} className={'sortable'}>
                       {column.render('Header')} 
-                      {/* todo: replace this by icon  */}
-                      {column.isSorted && <span> {column.isSortedDesc ? 'desc' : 'asc'}</span> }
+                      {column.isSorted ? (column.isSortedDesc ? <DownIcon/> : <UpIcon/>): null }
                     </span>
                     
                   ) : (

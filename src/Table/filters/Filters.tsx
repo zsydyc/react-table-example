@@ -1,6 +1,8 @@
 import { FilterProps } from 'react-table'
 import { ExperimentData } from '../../utils'
 
+import { filterItem } from '../styles'
+
 // This is a custom aggregator that
 // takes in an array of values and
 // returns the rounded median
@@ -29,13 +31,12 @@ export function CheckboxColumnFilter({
         {render('Header')}
       </label>
 
-      {/* Todo: give styles to each filter group  */}
       <div>
         {Object.entries(enumType)
           .filter(([index, type]) => !isNaN(Number(index))) // we want all the number indexes
           .map(([index, type]) => {
             return (
-              <span>
+              <span className={filterItem}>
                 <input type="checkbox"
                   key={`${enumType}_${type}`}
                   id={`${id}_${index}`}
@@ -55,7 +56,7 @@ export function CheckboxColumnFilter({
                     setFilter(newFilterValue)
                   }}
                 />
-                <label htmlFor={`${enumType}_${type}`}>{type}</label>
+                <label htmlFor={`${id}_${index}`}>{type}</label>
               </span>
             );
           })

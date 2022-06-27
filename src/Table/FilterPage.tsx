@@ -1,31 +1,9 @@
-import { Popover, createStyles, makeStyles } from '@material-ui/core'
+import { Popover } from '@material-ui/core'
 import { FormEvent, ReactElement, useCallback } from 'react'
 import { TableInstance } from 'react-table'
+import { cx } from '@emotion/css'
+import { filterResetButton, menuTitle, contextMenu, columnsPopOver, filterSection } from './styles';
 
-import { filterResetButton } from './TableStyles';
-
-// todo: clean this style 
-const useStyles = makeStyles(
-  createStyles({
-    columnsPopOver: {
-      padding: 24,
-    },
-    grid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, 218px)',
-      '@media (max-width: 600px)': {
-        gridTemplateColumns: 'repeat(1, 180px)',
-      },
-      gridColumnGap: 24,
-      gridRowGap: 24,
-    },
-    cell: {
-      width: '100%',
-      display: 'inline-flex',
-      flexDirection: 'column',
-    },
-  })
-)
 
 type FilterPageProps<T extends Record<string, unknown>> = {
   instance: TableInstance<T>
@@ -40,7 +18,6 @@ export function FilterPage<T extends Record<string, unknown>>({
   onClose,
   show,
 }: FilterPageProps<T>): ReactElement {
-  const classes = useStyles({})
   const { allColumns, setAllFilters } = instance
 
   const onSubmit = useCallback(
@@ -63,6 +40,7 @@ export function FilterPage<T extends Record<string, unknown>>({
         id={'popover-filters'}
         onClose={onClose}
         open={show}
+        className={columnsPopOver}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'right',
@@ -72,20 +50,19 @@ export function FilterPage<T extends Record<string, unknown>>({
           horizontal: 'right',
         }}
       >
-        <div className={classes.columnsPopOver}>
-          <h2>Filters</h2>
+        <div className={cx(columnsPopOver, contextMenu)}>
+          <span className={menuTitle}>Filters</span>
           <form onSubmit={onSubmit}>
-            
-            <div className={classes.grid}>
+            <div>
               {allColumns
                 .filter((it) => it.canFilter)
                 .map((column) => (
-                  <div key={column.id} className={classes.cell}>
+                  <div key={column.id} className={filterSection}>
                     {column.render('Filter')}
                   </div>
                 ))}
             </div>
-            <button className={filterResetButton}  onClick={resetFilters}>
+            <button className={filterResetButton} onClick={resetFilters}>
               Reset
             </button>
           </form>

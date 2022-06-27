@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactElement } from 'react';
 import { TableInstance } from 'react-table'
 
-// todo: input icons for pagination
+import { paginationWrapper, paginationPageSelect, paginationPageNavigation } from './styles'
 
 function TablePagination<T extends Record<string, unknown>>({
   instance,
@@ -17,41 +17,48 @@ function TablePagination<T extends Record<string, unknown>>({
     canNextPage,
     pageCount,
     pageOptions,
-  } = instance
+    state: { selectedRowIds },
+  } = instance;
+
+  const selectedRowLength = Object.keys(selectedRowIds).length;
+
 
   return (
-    <div className="pagination">
-      <span> Experiments per page <select
-        value={pageSize}
-        onChange={e => {
-          setPageSize(Number(e.target.value))
-        }}
-      >
-        {[10, 20, 30, 40, 50].map(pageSize => (
-          <option key={pageSize} value={pageSize}>
-            {pageSize}
-          </option>
-        ))}
-      </select></span>
-      
-      <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-        {'<<'}
-      </button>
-      <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-        {'<'}
-      </button>
-      <button onClick={() => nextPage()} disabled={!canNextPage}>
-        {'>'}
-      </button>
-      <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-        {'>>'}
-      </button>
-      <span>
-        <strong>
-          {pageIndex + 1} - {pageOptions.length} of {pageCount * pageSize}
-        </strong>
-      </span>
-      
+    <div className={paginationWrapper}>
+      <div>{ selectedRowLength } experiment{selectedRowLength > 1 && 's'} selected</div>
+      <div>
+        <span className={paginationPageSelect}> Experiments per page <select
+          value={pageSize}
+          onChange={e => {
+            setPageSize(Number(e.target.value))
+          }}
+        >
+          {[10, 20, 30, 40, 50].map(pageSize => (
+            <option key={pageSize} value={pageSize}>
+              {pageSize}
+            </option>
+          ))}
+        </select></span>
+
+        <span className={paginationPageNavigation}>
+          <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+            {'<<'}
+          </button>
+          <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+            {'<'}
+          </button>
+          <button onClick={() => nextPage()} disabled={!canNextPage}>
+            {'>'}
+          </button>
+          <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+            {'>>'}
+          </button>
+        </span>
+        <span>
+            {pageIndex + 1} - {pageOptions.length} of {pageCount * pageSize}
+        </span>
+      </div>
+
     </div>);
 
 }

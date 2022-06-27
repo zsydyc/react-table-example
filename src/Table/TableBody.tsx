@@ -1,31 +1,10 @@
 import { useState, PropsWithChildren, ReactElement, useEffect } from 'react';
 
-import {
-  TableInstance,
-} from 'react-table';
+import { TableInstance } from 'react-table';
 
 import ContextMenu from "./ContextMenu";
-import { cx, css } from '@emotion/css'
-
-// const iconDirectionAsc = css`
-//   transform: rotate(90deg);
-// `;
-// const iconDirectionDesc = css`
-//   transform: rotate(180deg);
-// `;
-// const cellIcon = css`
-//   & svg {
-//     width: 16px;
-//     height: 16px;
-//     margin-top: 3px;
-//   }
-// `;
-
-const tableBodyStyle = css`
-  td {
-    display: flex;
-  }
-`;
+import { cx } from '@emotion/css';
+import { tableRow } from './styles';
 
 
 function TableBody<T extends Record<string, unknown>>({
@@ -70,7 +49,7 @@ function TableBody<T extends Record<string, unknown>>({
 
   return (
     <>
-      <tbody className={tableBodyStyle}>
+      <tbody>
         {page.map((row) => {
           prepareRow(row);
           const { key: rowKey, role: rowRole, ...getRowProps } = row.getRowProps();
@@ -82,7 +61,7 @@ function TableBody<T extends Record<string, unknown>>({
               onContextMenu={(e)=>handleContextMenu(e, row.original.name as string, row.original.stauts as string )}
               {...getRowProps}
               className={cx(
-                { 'rowSelected': row.isSelected }
+                { 'rowSelected': row.isSelected }, tableRow
               )}
             >
               {row.cells.map((cell) => {

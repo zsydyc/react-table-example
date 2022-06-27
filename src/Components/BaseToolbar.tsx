@@ -1,5 +1,3 @@
-import React from "react";
-
 import styled from "@emotion/styled";
 
 export const ToolbarStyled = styled.article`
@@ -16,13 +14,15 @@ export const ToolbarStyled = styled.article`
 
   box-shadow: inset 0px -1px 0px rgba(97, 97, 97, 0.25);
   border-radius: 8px 8px 0px 0px;
-
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  height: 48px;
 `;
 
 export const LeftIconsSection = styled.section`
   flex-grow: 1;
-
   display: flex;
   align-items: center;
 `;

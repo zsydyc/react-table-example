@@ -2,27 +2,31 @@ import {CellProps} from "react-table"
 
 import {ExperimentData, ExperimentStatus, ExperimentType} from "../utils"
 
-import {CheckboxColumnFilter} from "./filters/Filters"
+import {CheckboxColumnFilter} from "./filters/Filters";
+import { ReactComponent as FavoriteIcon  } from '../Icons/Star.svg';
 
 const columns = [
   {
     Header: 'Name',
     columns: [
-      {
-        Header: 'Favorite',
-        accessor: 'favorite',
-        aggregate: 'count',
-        width: 50,
-        minWidth: 50,
-        disableFilters: true,
-        disableSortBy: true,
-      },
+      // hide favorite column
+      // {
+      //   Header: '',
+      //   accessor: 'favorite',
+      //   aggregate: 'count',
+      //   width: 50,
+      //   minWidth: 50,
+      //   disableFilters: true,
+      //   disableSortBy: true,
+      // },
       {
         Header: 'Name',
         accessor: 'name',
         aggregate: 'count',
         filter: 'fuzzyText',
         disableFilters: true,
+        width: 200,
+        maxWidth: 500,
       },
       {
         Header: 'Type',
@@ -51,7 +55,9 @@ const columns = [
         disableGroupBy: true,
         defaultCanSort: false,
         disableSortBy: false,
+        disableFilters: true,
         Aggregated: ({ cell: { value } }: CellProps<ExperimentData>) => `${value} Descriptions`,
+        minWidth: 340,
       },
       {
         Header: 'Modified On',
@@ -61,7 +67,8 @@ const columns = [
       {
         Header: 'Modified By',
         accessor: 'modifiedBy',
-        filter: 'fuzzyText',
+        // filter: 'fuzzyText',
+        disableFilters: true,
       },
       {
         Header: 'Created On',
@@ -71,7 +78,8 @@ const columns = [
       {
         Header: 'Created By',
         accessor: 'createdBy',
-        filter: 'fuzzyText',
+        // filter: 'fuzzyText',
+        disableFilters: true,
       },
     ],
   },

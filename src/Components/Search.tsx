@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import {TableInstance} from 'react-table'
+import { ReactComponent as SearchIcon  } from '../Icons/Magnifying_glass.svg';
+import { ReactComponent as CloseIcon  } from '../Icons/X.svg';
 
 interface SearchProps<T extends Record<string, unknown>> {
-  instance: TableInstance<T>;
+  instance: TableInstance<T>; 
 }
 
 const Search = <T extends Record<string, unknown>>({ instance }: SearchProps<T>) => {
@@ -22,7 +24,7 @@ const Search = <T extends Record<string, unknown>>({ instance }: SearchProps<T>)
   return (
     <>
 {/* // todo: repalce this with search icon */}
-      <span style={{color: "white"}}>ICON</span>
+      <SearchIcon/>
       <input
         name={'search'}
         value={search}
@@ -30,7 +32,7 @@ const Search = <T extends Record<string, unknown>>({ instance }: SearchProps<T>)
       />
       {/* todo: remove seach icon click  */}
       {/* todo: replace with str has length function  */}
-      {search && <span style={{color: "white"}} onClick={clearSearch}>X</span>}
+      {search && <CloseIcon onClick={clearSearch} />}
     </>
   )
 }

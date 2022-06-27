@@ -1,4 +1,3 @@
-import { CssBaseline } from '@material-ui/core'
 import React, { useCallback } from 'react'
 import { TableInstance } from 'react-table'
 
@@ -8,10 +7,8 @@ import { ExperimentData, makeData } from './utils'
 
 import columns from './Table/columns'
 
-
 const App: React.FC = () => {
   const [data] = React.useState<ExperimentData[]>(() => makeData(100))
-
   const dummy = useCallback(
     (instance: TableInstance<ExperimentData>) => () => {
       console.log(
@@ -21,15 +18,12 @@ const App: React.FC = () => {
     },
     []
   )
-
   return (
     <Page>
-      <CssBaseline />
       <Table<ExperimentData>
         name={'Experiments'}
         columns={columns}
-        data={data}
-        onAdd={dummy}
+        data={data}onAdd={dummy}
         onEdit={dummy}
         onDelete={dummy}
       />

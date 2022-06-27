@@ -1,4 +1,4 @@
-import { MouseEvent, MouseEventHandler, PropsWithChildren, ReactElement, useCallback, useState } from 'react'
+import { MouseEvent, MouseEventHandler, PropsWithChildren, ReactElement, useCallback, useState, useMemo } from 'react'
 
 import { TableInstance } from 'react-table'
 
@@ -9,6 +9,16 @@ import Search from '../Components/Search';
 import { TableMouseEventHandler } from '../../types/react-table-config'
 import { ColumnHidePage } from './ColumnHidePage'
 import { FilterPage } from './FilterPage'
+
+import { ReactComponent as FavoriteIcon } from '../Icons/Star.svg';
+import { ReactComponent as DeleteIcon } from '../Icons/Trash.svg';
+import { ReactComponent as CopyIcon } from '../Icons/Copy.svg';
+import { ReactComponent as ColumnIcon } from '../Icons/Hamburger.svg';
+import { ReactComponent as FilterIcon } from '../Icons/Filter.svg';
+
+import { cx } from '@emotion/css'
+import { toolbarColumn, toolbarButton, toolbarCounter, favoriteWrapper } from './styles';
+
 
 type InstanceActionButton<T extends Record<string, unknown>> = {
   instance: TableInstance<T>
@@ -32,23 +42,22 @@ export const InstanceSmallIconActionButton = <T extends Record<string, unknown>>
   instance,
   icon,
   onClick,
-  label,
   enabled = () => true,
-  variant,
 }: InstanceActionButton<T>): ReactElement => {
   return (
     <>
-    {/* todo: add Tooltip  */}
-    {/* <Tooltip title={label} aria-label={label}> */}
+      {/* todo: add Tooltip  */}
+      {/* <Tooltip title={label} aria-label={label}> */}
       <span>
         <button
+          className={toolbarButton}
           onClick={onClick(instance)}
           disabled={!enabled(instance)}
         >
           {icon}
         </button>
       </span>
-    {/* </Tooltip> */}
+      {/* </Tooltip> */}
     </>
   )
 }
@@ -56,23 +65,20 @@ export const InstanceSmallIconActionButton = <T extends Record<string, unknown>>
 export const SmallIconActionButton = ({
   icon,
   onClick,
-  label,
   enabled = true,
-  variant,
 }: ActionButton): ReactElement => {
   return (
     <>
-    {/* todo: add Tooltip  */}
-    {/* <Tooltip title={label} aria-label={label}> */}
-      <span>
-        <button
-          onClick={onClick}
-          disabled={!enabled}
-        >
-          {icon}
-        </button>
-      </span>
-    {/* </Tooltip> */}
+      {/* todo: add Tooltip  */}
+      {/* <Tooltip title={label} aria-label={label}> */}
+      <button
+        className={toolbarButton}
+        onClick={onClick}
+        disabled={!enabled}
+      >
+        {icon}
+      </button>
+      {/* </Tooltip> */}
     </>
   )
 }
@@ -89,14 +95,24 @@ export function TableToolbar<T extends Record<string, unknown>>({
   onDelete,
   onEdit,
 }: PropsWithChildren<TableToolbarProps<T>>): ReactElement | null {
-  const { columns } = instance
+  const { columns, state: { filters } } = instance
   const [anchorEl, setAnchorEl] = useState<Element | undefined>(undefined)
   const [columnsOpen, setColumnsOpen] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
   const hideableColumns = columns.filter((column) => !(column.id === '_selector'));
   const visibileColumnsCount = columns.filter((column) => column.isVisible).length;
+  const appliedFilterCount = useMemo(() => {
+    let count = 0;
+    filters.forEach((filter) => {
+      for (let key in filter.value) {
+        count += (filter.value[key] === true ? 1 : 0);
+      }
+    });
+    return count;
+  }, [filters]);
 
-  console.log('columns', columns);
+  const columnFilterActive = visibileColumnsCount < columns.length;
+  const filtersActive = appliedFilterCount > 0;
 
   const handleColumnsClick = useCallback(
     (event: MouseEvent) => {
@@ -118,7 +134,7 @@ export function TableToolbar<T extends Record<string, unknown>>({
     setColumnsOpen(false)
     setFilterOpen(false)
     setAnchorEl(undefined)
-  }, [])
+  }, []);
 
   return (
     <ToolbarStyled>
@@ -126,21 +142,31 @@ export function TableToolbar<T extends Record<string, unknown>>({
         <Search instance={instance} />
 
         <SmallIconActionButton
-          icon={<span>Filter Icon</span>}
+          icon={
+            <span className={cx(toolbarColumn, filtersActive ? 'active': '')}>
+            <FilterIcon />
+            {
+              filtersActive && 
+              <span className={cx(toolbarCounter, filtersActive ? 'active': '')}><Count count={`${appliedFilterCount}`} /></span>
+            }
+          </span>
+          }
           onClick={handleFilterClick}
           label="Filter by columnsFilter by columnsFilter by columnsFilter by columnsFilter by columns"
           variant="right"
         />
 
         {/* // favorite  */}
-        <Count icon={<span>favorite Icon</span>} count={`${0}`} />
+        <span className={favoriteWrapper}>
+          <Count icon={<FavoriteIcon />} count={`${0}`} />
+        </span>
 
         <Divider />
 
         {onEdit && (
           <InstanceSmallIconActionButton<T>
             instance={instance}
-            icon={<span>Copy Icon</span>}
+            icon={<CopyIcon />}
             onClick={onEdit}
             label="Edit"
             enabled={({ state }: TableInstance<T>) =>
@@ -156,7 +182,7 @@ export function TableToolbar<T extends Record<string, unknown>>({
         {onDelete && (
           <InstanceSmallIconActionButton<T>
             instance={instance}
-            icon={<span>Delete Icon</span>}
+            icon={<DeleteIcon />}
             onClick={onDelete}
             label="Delete"
             enabled={({ state }: TableInstance<T>) =>
@@ -183,16 +209,22 @@ export function TableToolbar<T extends Record<string, unknown>>({
           anchorEl={anchorEl}
         />
         {hideableColumns.length > 1 && (
-          <>
-            {(visibileColumnsCount < columns.length) && <Count count={`${visibileColumnsCount}/${columns.length}`} />}
-            <SmallIconActionButton
-              icon={<span>Columns Icon</span>}
-              onClick={handleColumnsClick}
-              label="Show / hide columns"
-              variant="right"
-            /></>
+          <SmallIconActionButton
+            icon={
+              <span className={cx(toolbarColumn, columnFilterActive ? 'active': '')}>
+                <ColumnIcon />
+                {
+                  columnFilterActive && 
+                  <span className={cx(toolbarCounter, columnFilterActive ? 'active': '')}><Count count={`${visibileColumnsCount}/${columns.length}`} /></span>
+                }
+              </span>
+            }
+            onClick={handleColumnsClick}
+            label="Show / hide columns"
+            variant="right"
+          />
         )}
       </RightIconsSection>
-    </ToolbarStyled>
+    </ToolbarStyled >
   )
 }

@@ -20,8 +20,7 @@ const CountNumber = styled.section`
 
   width: 22px;
   height: 21px;
-
-  background: rgba(255, 255, 255, 0.1);
+  // background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 
   color: white;

@@ -22,7 +22,7 @@ import {
 } from 'react-table'
 
 import { camelToWords, useDebounce, useLocalStorage } from '../utils'
-import { FilterChipBar } from './FilterChipBar'
+// import { FilterChipBar } from './FilterChipBar'
 import { fuzzyTextFilter, numericTextFilter, enumMatchFilter } from './filters'
 
 import { TablePagination } from './TablePagination'
@@ -31,6 +31,8 @@ import { TableHeader } from './TableHeader'
 
 import { TableToolbar } from './TableToolbar'
 import { TooltipCellRenderer } from './TooltipCell'
+
+import {tableTable} from './styles';
 
 
 export interface TableProperties<T extends Record<string, unknown>> extends TableOptions<T> {
@@ -175,7 +177,7 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
   return (
     <>
       <TableToolbar instance={instance} {...{ onAdd, onDelete, onEdit }} />
-      <FilterChipBar<T> instance={instance} />
+      {/* <FilterChipBar<T> instance={instance} /> */}
       <table {...tableProps} >
         <TableHeader<T> instance={instance} />
         <TableBody<T> instance={instance} />

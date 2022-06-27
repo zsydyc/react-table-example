@@ -1,23 +1,11 @@
-import { FormControlLabel, Popover, createStyles, makeStyles } from '@material-ui/core'
+// todo: replace Popover
+import { Popover } from '@material-ui/core' 
 import { ReactElement } from 'react'
 import { TableInstance } from 'react-table'
 
-const useStyles = makeStyles(
-  createStyles({
-    columnsPopOver: {
-      padding: 24,
-    },
-    grid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, 198px)',
-      '@media (max-width: 600px)': {
-        gridTemplateColumns: 'repeat(1, 160px)',
-      },
-      gridColumnGap: 6,
-      gridRowGap: 6,
-    },
-  })
-)
+import { cx } from '@emotion/css'
+import { columnsPopOver, menuTitle, contextMenu, menuOptionsWrapper } from './styles';
+
 
 type ColumnHidePageProps<T extends Record<string, unknown>> = {
   instance: TableInstance<T>
@@ -26,7 +14,7 @@ type ColumnHidePageProps<T extends Record<string, unknown>> = {
   show: boolean
 }
 
-const id = 'popover-column-hide'
+const id = 'popover-column-hide';
 
 export function ColumnHidePage<T extends Record<string, unknown>>({
   instance,
@@ -34,7 +22,6 @@ export function ColumnHidePage<T extends Record<string, unknown>>({
   onClose,
   show,
 }: ColumnHidePageProps<T>): ReactElement | null {
-  const classes = useStyles({})
   const { allColumns, toggleHideColumn } = instance
   const hideableColumns = allColumns.filter((column) => !(column.id === '_selector'))
   const checkedCount = hideableColumns.reduce((acc, val) => acc + (val.isVisible ? 0 : 1), 0)
@@ -42,37 +29,32 @@ export function ColumnHidePage<T extends Record<string, unknown>>({
   const onlyOneOptionLeft = checkedCount + 1 >= hideableColumns.length
 
   return hideableColumns.length > 1 ? (
-    <div>
-      <Popover
-        anchorEl={anchorEl}
-        className={classes.columnsPopOver}
-        id={id}
-        onClose={onClose}
-        open={show}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-      >
-        <div className={classes.columnsPopOver}>
-          <h2>Columns</h2>
-          <div className={classes.grid}>
-            {hideableColumns.map((column) => (
-              <FormControlLabel
-                key={column.id}
-                control={<input type="checkbox" value={`${column.id}`} disabled={column.isVisible && onlyOneOptionLeft} />}
-                label={column.render('Header')}
-                checked={column.isVisible}
-                onChange={() => toggleHideColumn(column.id, column.isVisible)}
-              />
-            ))}
-          </div>
-        </div>
-      </Popover>
-    </div>
+    <Popover
+      anchorEl={anchorEl}
+      className={columnsPopOver}
+      id={id}
+      onClose={onClose}
+      open={show}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+    >
+      <div className={cx(columnsPopOver, contextMenu)}>
+        <span className={menuTitle}>Columns</span>
+        <ul className={menuOptionsWrapper}>
+          {hideableColumns.map((column) => (
+            <li key={column.id}>
+              <input type="checkbox" value={`${column.id}`} id={`${column.id}`} checked={column.isVisible} onChange={() => toggleHideColumn(column.id, column.isVisible)} disabled={column.isVisible && onlyOneOptionLeft} />
+              <label htmlFor={`${column.id}`}>{column.render('Header')}</label>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Popover>
   ) : null
 }
