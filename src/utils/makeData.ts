@@ -1,6 +1,18 @@
 import namor from '@ggascoigne/namor'
 import { format, subDays } from 'date-fns'
 
+const range = (len: number) => {
+  const arr = []
+  for (let i = 0; i < len; i++) {
+    arr.push(i)
+  }
+  return arr
+}
+
+export type makeData<ApiType> = (num: number) => ApiType[];
+
+// *** Experiments *** //
+
 // These enums are used in the filter rendering, assumed to be string to index mapping starting at 0 and auto incremented
 export enum ExperimentType {
   AutoPilot,
@@ -46,29 +58,11 @@ const newExperiment = (): Experiment => {
   }
 }
 
-export type Person = {
-  firstName: string
-  lastName: string
-  age: number
-  visits: number
-  progress: number
-  status: string
-}
-
-const range = (len: number) => {
-  const arr = []
-  for (let i = 0; i < len; i++) {
-    arr.push(i)
-  }
-  return arr
-}
-
 export type ExperimentData = Experiment & {
   subRows?: ExperimentData[]
 }
 
-
-export function makeData(...lens: number[]): ExperimentData[] {
+export function makeExpData(...lens: number[]): ExperimentData[] {
   const makeDataLevel = (depth = 0): ExperimentData[] => {
     const len = lens[depth]
     return range(len).map(() => ({
@@ -79,6 +73,55 @@ export function makeData(...lens: number[]): ExperimentData[] {
 
   return makeDataLevel()
 }
+
+// *** Runs *** //
+
+export type Run = {
+  name: string,
+  id: string,
+  description: string,
+  valMin: number,
+  valMax: number,
+}
+
+const newRun = (): Run => {
+  const id = Math.floor(Math.random() * 9999).toString();
+  return {
+    name: `Run-${id}`,
+    id,
+    description: namor.generate({ words: 4}),
+    valMin: Math.random(),
+    valMax: Math.random(),
+  }
+}
+
+export type RunData = Run & {
+  subRows?: RunData[]
+}
+
+export function makeRunData(...lens: number[]): RunData[] {
+  const makeDataLevel = (depth = 0): RunData[] => {
+    const len = lens[depth]
+    return range(len).map(() => ({
+      ...newRun(),
+      subRows: lens[depth + 1] ? makeDataLevel(depth + 1) : undefined,
+    }))
+  }
+
+  return makeDataLevel()
+}
+
+// *** Person *** //
+
+export type Person = {
+  firstName: string
+  lastName: string
+  age: number
+  visits: number
+  progress: number
+  status: string
+}
+
 
 const newPerson = (): Person => {
   const statusChance = Math.random()

@@ -1,6 +1,7 @@
 import React, { MouseEventHandler, PropsWithChildren, ReactElement, useEffect } from 'react'
 import {
   CellProps,
+  Column,
   ColumnInstance,
   FilterProps,
   HeaderProps,
@@ -20,27 +21,36 @@ import {
   useSortBy,
   useTable,
 } from 'react-table'
+import styled from '@emotion/styled'
 
-import { camelToWords, useDebounce, useLocalStorage } from '../utils'
-// import { FilterChipBar } from './FilterChipBar'
-import { fuzzyTextFilter, numericTextFilter, enumMatchFilter } from './filters'
+import InfoIcon from '@material-ui/icons/Info'
+
+import { Button } from '../Components/Base'
+import { Divider } from '../Components/BaseToolbar'
+import Count from '../Components/Count'
+import { ContainerHeader, ContainerArticle, HeaderSection, HeaderTitle } from '../Components/ContentContainer'
 
 import { TablePagination } from './TablePagination'
 import { TableBody } from './TableBody'
 import { TableHeader } from './TableHeader'
 
+import { camelToWords, GenericApiType, LoadingStatus, useDebounce, useLocalStorage } from '../utils'
+import { fuzzyTextFilter, numericTextFilter, enumMatchFilter } from './filters'
+
 import { TableToolbar } from './TableToolbar'
 import { TooltipCellRenderer } from './TooltipCell'
+import {useTableContext} from './TableContext'
+import {CircularProgress, LinearProgress} from '@material-ui/core'
 
-import {tableTable} from './styles';
-
-
-export interface TableProperties<T extends Record<string, unknown>> extends TableOptions<T> {
+// export interface TableProperties<T extends GenericApiType> extends TableOptions<T> {
+export interface TableProperties<T extends GenericApiType> {
   name: string
   onAdd?: (instance: TableInstance<T>) => MouseEventHandler
   onDelete?: (instance: TableInstance<T>) => MouseEventHandler
   onEdit?: (instance: TableInstance<T>) => MouseEventHandler
   onClick?: (row: Row<T>) => void
+  columns: ReadonlyArray<Column<T>>
+  data?: Readonly<T[]>
 }
 
 const DefaultHeader: React.FC<HeaderProps<any>> = ({ column }) => (
@@ -65,19 +75,19 @@ function DefaultColumnFilter<T extends Record<string, unknown>>({ columns, colum
   const isFirstColumn = findFirstColumn(columns) === column
   return (
     <>
-      <label htmlFor={id}>
-        {render('Header')}</label>
-        <input
-          name={id}
-          id={id}
-          value={value}
-          autoFocus={isFirstColumn}
-          // variant='standard'
-          onChange={handleChange}
-          onBlur={(e) => {
-            setFilter(e.target.value || undefined)
-          }}
-        />
+      <label htmlFor={id}>{render('Header')}</label>
+
+      <input
+        name={id}
+        id={id}
+        value={value}
+        autoFocus={isFirstColumn}
+        // variant='standard'
+        onChange={handleChange}
+        onBlur={(e) => {
+          setFilter(e.target.value || undefined)
+        }}
+      />
     </>
   )
 }
@@ -142,15 +152,24 @@ const filterTypes = {
   enumMatch: enumMatchFilter,
 }
 
-export function Table<T extends Record<string, unknown>>(props: PropsWithChildren<TableProperties<T>>): ReactElement {
+const ContentSection = styled.section`
+  overflow: scroll;
+`
+
+export function Table<T extends GenericApiType>(props: PropsWithChildren<TableProperties<T>>): ReactElement {
   const { name, columns, onAdd, onDelete, onEdit } = props;
+
   const [initialState, setInitialState] = useLocalStorage(`tableState:${name}`, {});
+
+  const { data, loadingStatus, isSearchLoading } = useTableContext()
 
   const instance = useTable<T>(
     {
+      data: data as T[], // data is override by props data, in which case the context will be defaulted to []
       ...props,
       columns,
       filterTypes,
+      // @ts-ignore
       defaultColumn,
       initialState,
     },
@@ -174,16 +193,45 @@ export function Table<T extends Record<string, unknown>>(props: PropsWithChildre
 
 
   const { role: tableRole, ...tableProps } = getTableProps()
-  return (
-    <>
-      <TableToolbar instance={instance} {...{ onAdd, onDelete, onEdit }} />
-      {/* <FilterChipBar<T> instance={instance} /> */}
-      <table {...tableProps} >
-        <TableHeader<T> instance={instance} />
-        <TableBody<T> instance={instance} />
-      </table>
-      <TablePagination<T> instance={instance} />
 
-    </>
+  const LoadingBar = () => {
+    if (loadingStatus == LoadingStatus.loadingInitial
+        || isSearchLoading)
+      return <LinearProgress color="primary" />
+    return null
+  }
+
+  const Spinner = () => {
+    if (loadingStatus == LoadingStatus.loadingInitial
+        || loadingStatus == LoadingStatus.lazyLoading
+        || isSearchLoading)
+      return <CircularProgress color="inherit" size={10} />
+    return null
+  }
+
+  return (
+    <ContainerArticle>
+      <ContainerHeader>
+        <HeaderSection>
+          <Count title={<HeaderTitle>{name}</HeaderTitle>} count={data.length} />
+          <Spinner />
+        </HeaderSection>
+        <HeaderSection>
+          <Button>Create</Button>
+          <Divider />
+          <InfoIcon />
+        </HeaderSection>
+      </ContainerHeader>
+
+      <TableToolbar instance={instance} {...{ onAdd, onDelete, onEdit }} />
+      <LoadingBar />
+      <ContentSection>
+        <table {...tableProps} >
+          <TableHeader<T> instance={instance} />
+          <TableBody<T> instance={instance} />
+        </table>
+      </ContentSection>
+      <TablePagination<T> instance={instance} typeDescriptor={name} />
+    </ContainerArticle>
   )
 }
