@@ -1,5 +1,7 @@
-import { FilterProps } from 'react-table'
-import { ExperimentData } from '../../utils'
+import {ReactNode} from 'react'
+import { FilterProps, TableInstance } from 'react-table'
+import { ExperimentData, GenericApiType } from '../../utils'
+import {ColumnIds} from '../columns'
 
 import { filterItem } from '../styles'
 
@@ -23,7 +25,7 @@ export function CheckboxColumnFilter({
   column: { render, filterValue, setFilter, id },
 }: FilterProps<ExperimentData>) {
   // default render gives ReactElement, but is passed as an object
-  const enumType = render('enumType') as Record<string, string>;
+  const enumType = render('enumType') as unknown as Record<string, string>;
 
   return (
     <section>
@@ -67,4 +69,14 @@ export function CheckboxColumnFilter({
   );
 }
 
+export function favoritesFilterToggle<ApiType extends GenericApiType>(
+  instance: TableInstance<ApiType>
+) {
+  const { columns, setAllFilters, setFilter } = instance
 
+  const favoriteColumn = columns.find(it => it.id === ColumnIds.favorite)
+  const { filterValue } = favoriteColumn ?? { filterValue: undefined }
+  setFilter(ColumnIds.favorite, !filterValue)
+
+  console.log(instance)
+}

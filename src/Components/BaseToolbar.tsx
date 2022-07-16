@@ -1,33 +1,36 @@
 import styled from "@emotion/styled";
 
 export const ToolbarStyled = styled.article`
-  background: linear-gradient(
-      0deg,
-      rgba(94, 73, 224, 0.05),
-      rgba(94, 73, 224, 0.05)
-    ),
-    linear-gradient(147.14deg, #262626 -3.16%, #050505 95.57%),
-    linear-gradient(180deg, #011e2e 0%, #00131a 100%),
-    linear-gradient(180deg, #002530 0%, #001921 100%),
-    linear-gradient(180deg, #403f50 0%, #2b2a35 100%);
-  /* ⭐ Design System/Light Bottom Border (1px) */
+  background: #23252E;
 
-  box-shadow: inset 0px -1px 0px rgba(97, 97, 97, 0.25);
-  border-radius: 8px 8px 0px 0px;
+  // box-shadow: inset 0px -1px 0px rgba(97, 97, 97, 0.25);
+  border: 1px solid rgba(145, 145, 160, 0.1);
+
+  height: 48px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 8px 16px;
-  height: 48px;
 `;
 
-export const LeftIconsSection = styled.section`
-  flex-grow: 1;
+const IconSection = styled.section`
   display: flex;
   align-items: center;
-`;
 
-export const RightIconsSection = styled.section``;
+  & > * {
+    margin-left: 1.5em; // 23px
+  }
+  
+`
+
+export const LeftIconsSection = styled(IconSection)`
+& > *:first-child {
+   margin-left: 0;
+ }
+`
+export const RightIconsSection = styled(IconSection)``
 
 export const Divider = styled.hr`
   display: block;
@@ -39,6 +42,5 @@ export const Divider = styled.hr`
   border-radius: 2px;
 
   border: none;
-  margin: 0 1em;
 `;
 

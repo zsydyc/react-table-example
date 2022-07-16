@@ -1,12 +1,13 @@
-import { MouseEvent, MouseEventHandler, PropsWithChildren, ReactElement, useCallback, useState, useMemo } from 'react'
+import { MouseEvent, MouseEventHandler, PropsWithChildren, ReactElement, useCallback, useState, useMemo, useEffect } from 'react'
 
 import { TableInstance } from 'react-table'
+import styled from '@emotion/styled'
+import { TableMouseEventHandler } from '../../types/react-table-config'
 
 import { ToolbarStyled, LeftIconsSection, RightIconsSection, Divider } from '../Components/BaseToolbar';
 import Count from '../Components/Count';
 import Search from '../Components/Search';
 
-import { TableMouseEventHandler } from '../../types/react-table-config'
 import { ColumnHidePage } from './ColumnHidePage'
 import { FilterPage } from './FilterPage'
 
@@ -16,8 +17,9 @@ import { ReactComponent as CopyIcon } from '../Icons/Copy.svg';
 import { ReactComponent as ColumnIcon } from '../Icons/Hamburger.svg';
 import { ReactComponent as FilterIcon } from '../Icons/Filter.svg';
 
-import { cx } from '@emotion/css'
-import { toolbarColumn, toolbarButton, toolbarCounter, favoriteWrapper } from './styles';
+import {GenericApiType} from '../utils';
+import {Tooltip} from '@material-ui/core';
+import {favoritesFilterToggle} from './filters/Filters';
 
 
 type InstanceActionButton<T extends Record<string, unknown>> = {
@@ -37,70 +39,83 @@ type ActionButton = {
   variant?: 'right' | 'left'
 }
 
+const ToolbarButton = styled.button`
+  background:none;
+  border:none;
+  outline: none;
+
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:disabled {
+    opacity: 10%;
+  }
+`
 
 export const InstanceSmallIconActionButton = <T extends Record<string, unknown>>({
   instance,
   icon,
   onClick,
+  label,
   enabled = () => true,
 }: InstanceActionButton<T>): ReactElement => {
   return (
-    <>
-      {/* todo: add Tooltip  */}
-      {/* <Tooltip title={label} aria-label={label}> */}
-      <span>
-        <button
-          className={toolbarButton}
-          onClick={onClick(instance)}
-          disabled={!enabled(instance)}
-        >
-          {icon}
-        </button>
-      </span>
-      {/* </Tooltip> */}
-    </>
+    <Tooltip title={label} aria-label={label}>
+      <ToolbarButton
+        onClick={onClick(instance)}
+        disabled={!enabled(instance)}
+      >
+        {icon}
+      </ToolbarButton>
+    </Tooltip>
   )
 }
 
 export const SmallIconActionButton = ({
   icon,
   onClick,
+  label,
   enabled = true,
 }: ActionButton): ReactElement => {
   return (
-    <>
-      {/* todo: add Tooltip  */}
-      {/* <Tooltip title={label} aria-label={label}> */}
-      <button
-        className={toolbarButton}
+    <Tooltip title={label} aria-label={label}>
+      <ToolbarButton
         onClick={onClick}
         disabled={!enabled}
       >
         {icon}
-      </button>
-      {/* </Tooltip> */}
-    </>
+      </ToolbarButton>
+    </Tooltip>
   )
 }
 
-type TableToolbarProps<T extends Record<string, unknown>> = {
+// type TableToolbarProps<T extends Record<string, unknown>> = {
+type TableToolbarProps<T extends GenericApiType> = {
   instance: TableInstance<T>
   onAdd?: TableMouseEventHandler
   onDelete?: TableMouseEventHandler
   onEdit?: TableMouseEventHandler
 }
 
-export function TableToolbar<T extends Record<string, unknown>>({
+export function TableToolbar<T extends GenericApiType>({
   instance,
   onDelete,
   onEdit,
 }: PropsWithChildren<TableToolbarProps<T>>): ReactElement | null {
-  const { columns, state: { filters } } = instance
+  const { columns, state: { filters }, data } = instance
+
   const [anchorEl, setAnchorEl] = useState<Element | undefined>(undefined)
   const [columnsOpen, setColumnsOpen] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
+  const [filterFavorites, setFilterFavorites] = useState(false)
+  const [favoritesCount, setFavoritesCount] = useState(0)
+
   const hideableColumns = columns.filter((column) => !(column.id === '_selector'));
   const visibileColumnsCount = columns.filter((column) => column.isVisible).length;
+
   const appliedFilterCount = useMemo(() => {
     let count = 0;
     filters.forEach((filter) => {
@@ -111,8 +126,12 @@ export function TableToolbar<T extends Record<string, unknown>>({
     return count;
   }, [filters]);
 
+  useEffect(() => {
+    setFavoritesCount(data.filter(it => it.favorite).length)
+  }, [data])
+
   const columnFilterActive = visibileColumnsCount < columns.length;
-  const filtersActive = appliedFilterCount > 0;
+  // const filtersActive = appliedFilterCount > 0;
 
   const handleColumnsClick = useCallback(
     (event: MouseEvent) => {
@@ -136,30 +155,29 @@ export function TableToolbar<T extends Record<string, unknown>>({
     setAnchorEl(undefined)
   }, []);
 
+  const handleFavoritesToggle = () => {
+    setFilterFavorites(!filterFavorites)
+    favoritesFilterToggle(instance)
+  }
+
   return (
     <ToolbarStyled>
       <LeftIconsSection>
         <Search instance={instance} />
 
-        <SmallIconActionButton
-          icon={
-            <span className={cx(toolbarColumn, filtersActive ? 'active': '')}>
-            <FilterIcon />
-            {
-              filtersActive && 
-              <span className={cx(toolbarCounter, filtersActive ? 'active': '')}><Count count={`${appliedFilterCount}`} /></span>
-            }
-          </span>
-          }
+        <Count
+          active={appliedFilterCount > 0}
+          icon={<FilterIcon />}
+          count={appliedFilterCount}
           onClick={handleFilterClick}
-          label="Filter by columnsFilter by columnsFilter by columnsFilter by columnsFilter by columns"
-          variant="right"
         />
 
-        {/* // favorite  */}
-        <span className={favoriteWrapper}>
-          <Count icon={<FavoriteIcon />} count={`${0}`} />
-        </span>
+        <Count
+          active={filterFavorites}
+          icon={<FavoriteIcon />}
+          count={favoritesCount}
+          onClick={handleFavoritesToggle}
+        />
 
         <Divider />
 
@@ -209,22 +227,16 @@ export function TableToolbar<T extends Record<string, unknown>>({
           anchorEl={anchorEl}
         />
         {hideableColumns.length > 1 && (
-          <SmallIconActionButton
-            icon={
-              <span className={cx(toolbarColumn, columnFilterActive ? 'active': '')}>
-                <ColumnIcon />
-                {
-                  columnFilterActive && 
-                  <span className={cx(toolbarCounter, columnFilterActive ? 'active': '')}><Count count={`${visibileColumnsCount}/${columns.length}`} /></span>
-                }
-              </span>
-            }
+          <Count
+            icon={<ColumnIcon />}
+            tooltipLabel="Show / hide columns"
+            active={columnFilterActive}
+            count={columnFilterActive && (
+              `${visibileColumnsCount}/${columns.length}`)}
             onClick={handleColumnsClick}
-            label="Show / hide columns"
-            variant="right"
           />
         )}
       </RightIconsSection>
-    </ToolbarStyled >
+    </ToolbarStyled>
   )
 }

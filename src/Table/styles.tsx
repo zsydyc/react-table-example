@@ -25,17 +25,23 @@ const tableWrapper = css`
   --secondary-bg-color: var(--main-black-grey);
   --main-active-color: var(--main-purple);
 
+  font-family: Lucida Grande, sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+  & * {
+    box-sizing: border-box;
+  }
 `
 
 
 // Table CSS
 
-const tableTable = css`
-  border-spacing: 0,
-  border: 1px solid var(----main-black-grey),
-  width: 100%;
-  border-radius: 8px 8px 0px 0px;
-`;
+// const tableTable = css`
+//   border-spacing: 0,
+//   border: 1px solid var(----main-black-grey),
+//   width: 100%;
+//   border-radius: 8px 8px 0px 0px;
+// `;
 
 // table toolbar 
 
@@ -62,47 +68,46 @@ const toolbarButton = css`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 10px;
-  svg{
-    margin:10px;
-  }
+
+  // svg{
+  //   margin:10px;
+  // }
+
   &:disabled {
     opacity: 10%;
   }
 `;
 
-const toolbarColumn = css`
-display: flex;
-align-items: center;
-&:hover{
-  background: var(--main-purple);
-}
-&.active {
-  background: var(--main-purple);
-  padding: 3px 12px;
-  height: 32px;
-  border-radius: 4px;
-}
-`;
-
-
-
-const favoriteWrapper = css`
-  article{
-    display: flex;
-    align-items: center;
-  }
-`;
-const toolbarCounter = css`
-display: flex;
-align-items: center;
-&.active {
-  background: var(--main-purple-dark);
-  padding: 3px 6px;
-  height: 21px;
-  border-radius: 4px;
-}
-`;
+// const toolbarColumn = css`
+// display: flex;
+// align-items: center;
+// &:hover{
+//   background: var(--main-purple);
+// }
+// &.active {
+//   background: var(--main-purple);
+//   padding: 3px 12px;
+//   height: 32px;
+//   border-radius: 4px;
+// }
+// `;
+//
+// const favoriteWrapper = css`
+//   article{
+//     display: flex;
+//     align-items: center;
+//   }
+// `;
+// const toolbarCounter = css`
+// display: flex;
+// align-items: center;
+// &.active {
+//   background: var(--main-purple-dark);
+//   padding: 3px 6px;
+//   height: 21px;
+//   border-radius: 4px;
+// }
+// `;
 
 
 
@@ -117,27 +122,35 @@ const tableHeadRow = css`
     opacity: 1;
     color:white;
   }
+
   td {
     margin: 5px 0px;
     height: 32px;
     display: flex;
     align-items: center;
-    padding-left: 5px;
-    border-left:solid 1px var(--main-black-3);
+
+    padding-right: 2em; // To space the SVG more inwards
+
     &:first-child{
       border-left: none;
       justify-content: center;
     }
+
     span.sortable {
       width: 100%;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+
       svg {
         opacity: 50%;
       }
     }
+  }
+
+  td:first-of-type {
+    padding-left: 21px;
   }
 `;
 
@@ -307,4 +320,26 @@ button{
   }
 }
 `
-export { tableWrapper, toolbarButton, toolbarColumn,  toolbarCounter, columnsPopOver, tableTable, tableHeadRow, tableHeadCell, tableRow, tableCell, filterResetButton, paginationWrapper, paginationPageSelect, paginationPageNavigation, menuTitle, filterSection, filterItem, contextMenu, menuOptionsWrapper, favoriteWrapper, tableBodyContextMenu};
+export {
+  tableWrapper,
+  toolbarButton,
+  columnsPopOver,
+  // tableTable,
+  tableHeadRow,
+  tableHeadCell,
+  tableRow,
+  tableCell,
+  filterResetButton,
+  paginationWrapper,
+  paginationPageSelect,
+  paginationPageNavigation,
+  menuTitle,
+  filterSection,
+  filterItem,
+  contextMenu,
+  menuOptionsWrapper,
+  // favoriteWrapper,
+  // toolbarColumn,
+  // toolbarCounter,
+  tableBodyContextMenu
+};
