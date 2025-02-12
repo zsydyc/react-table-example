@@ -3,8 +3,8 @@
 This demo is forked from : [https://github.com/ggascoigne/react-table-example](https://github.com/ggascoigne/react-table-example)
 
 Demo of React Table V7 using TypeScript as well as Material UI
-
-- `yarn` and `yarn start` to run and edit the example
+- First, install `yarn` if not available
+- do `yarn install` and `yarn start` to run and edit the example
 
 This example uses:
   * `useGroupBy` to enable header groups
